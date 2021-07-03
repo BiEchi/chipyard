@@ -30,3 +30,16 @@ Alternatively, if you insist on installing the image on your own computer, be su
 
 After installation, please be sure you know about the basic workflow of the `gemmini` project. Please go to [this website](https://github.com/ucb-bar/gemmini) for detailed information.
 
+## pull the docker images
+
+`docker pull chipyard/chipyard_transformer`
+
+## mount the git gemmini with docker container
+
+https://github.com/BiEchi/chipyard
+
+```shell
+docker run -it --name=chipyard-transformer \
+--mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer
+```
+
