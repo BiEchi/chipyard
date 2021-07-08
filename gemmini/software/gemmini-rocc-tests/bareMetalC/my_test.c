@@ -274,7 +274,7 @@ int main() {
   static elem_t id_mat_z[DIM_K][DIM_K];
   for (size_t i = 0; i < DIM_K; i++)
     for (size_t j = 0; j < DIM_K; j++)
-	id_mat_z[i][j] = i == j;
+	id_mat_z[i][j] = (i == j);
   start = read_cycles();
   tiled_matmul_auto(DIM_I, DIM_K, DIM_K,
             (elem_t*)final_z_mat, (elem_t*)id_mat_z, (elem_t*)z_vector, (elem_t*)added_z_mat,
