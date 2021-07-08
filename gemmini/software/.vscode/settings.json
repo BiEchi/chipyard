@@ -2,6 +2,9 @@
     "files.associations": {
         "*.S": "platformio-debug.asm",
         "*.asm": "mips",
-        "gemmini_testutils.h": "c"
+        "gemmini_testutils.h": "c",
+        "decoder.h": "c",
+        "encoder.h": "c",
+        "stdlib.h": "c"
     }
 }
