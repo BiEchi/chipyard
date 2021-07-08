@@ -5,13 +5,14 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "math.h"  // BUGGY
 
 #ifndef BAREMETAL
 #include <sys/mman.h>
-#endif
+#endif // system func
+
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
-#include "math.h"
 
 #define DIM_I 64
 #define DIM_J 32
@@ -203,7 +204,7 @@ int main() {
             false, true,
             false, false,
             3,
-            WS); 
+            WS);
   }
   end = read_cycles();
   printf("Time for Q*K^T: %d\n",end-start);
@@ -317,13 +318,13 @@ int main() {
             3,
             WS);   
   end = read_cycles();
-  printf("Time for add & normalization after FC: %d\n",end-start);
+  printf("Time for add & normalization after Fully Connected Layer: %d\n",end-start);
 
   // add and normalize(normalization part), unfinished
   static elem_t final_encoder_output[DIM_I][DIM_K];
 
 
-  gemmini_fence();  
+  gemmini_fence();  // system func
   exit(0);
 }
 
