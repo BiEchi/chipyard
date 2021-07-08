@@ -17,9 +17,10 @@
 #include "include/my_test_headers/encoder.h"
 
 
-//============================ignoring functions above ======================================
-
 int main() {
+  
+  /***** DO NOT CHANGE CONTENT BELOW *****/
+
 #ifndef BAREMETAL
     if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
       perror("mlockall failed");
@@ -29,9 +30,17 @@ int main() {
 
   gemmini_flush(0);
 
+  /***** YOUR CODE STARTS HERE *****/
+
   static elem_t word_vector0[DIM_I][DIM_K] row_align(1) = {5};
+  
+
   encoder(word_vector0);
   decoder();
+
+
+
+  /***** DO NOT CHANGE CONTENT BELOW *****/
 
   gemmini_fence();  // system func
   exit(0);
