@@ -13,9 +13,9 @@
 #include "include/gemmini_nn.h"
 #include "math.h"
 
-#define DIM_I 64
-#define DIM_J 32
-#define DIM_K 128
+#define DIM_I 2
+#define DIM_J 4
+#define DIM_K 8
 #define n_head 4
 
 
@@ -131,6 +131,14 @@ int main() {
   static elem_t z_qs[n_head][DIM_I][DIM_J];
   static elem_t z_ks[n_head][DIM_I][DIM_J];
   static elem_t z_vs[n_head][DIM_I][DIM_J];
+
+
+
+  // for(int i=0;i<n_head;i++)
+  // {
+  //   rand_matrix(DIM_K,DIM_J,(elem_t*)q_mats[i]);
+  //   print_matrix(DIM_K,DIM_J,q_mats[i]);
+  // }
 
   /*====================Transformer Encoder======================*/
 
