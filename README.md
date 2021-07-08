@@ -17,10 +17,20 @@ docker run -it --name=chipyard-transformer \
 
 ## Things TODO
 
--   `math.h` header file.
--   `softmax()` implementation.
--   `normalize()` implementation.
--   `WS/OS/CPU` choices implementation.
--   `decoder()` part.
--   `sin()` for positional encoding.
+| TODO                                | Executer    | Day SPENT |
+| ----------------------------------- | ----------- | --------- |
+| `math.h` header file.               | Hao BAI     | 0         |
+| `softmax()` implementation.         | Liyang QIAN | 3         |
+| `normalize()` implementation.       | Liyang QIAN | 3         |
+| `WS/OS/CPU` choices implementation. | Hao BAI     | 0         |
+| `sin()` for positional encoding.    | Liyang QIAN | 3         |
+| `decoder()` part.                   | Wentao YAO  | 3         |
+
+## Our Working Time
+
+| Time          | Name        |
+| ------------- | ----------- |
+| 9-7-6         | Liyang QIAN |
+| 10-7-6        | Wentao YAO  |
+| 9-5-6 / 9-9-5 | Hao BAI     |
 
