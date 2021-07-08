@@ -12,15 +12,27 @@
 
 #define PG_SIZE (4*1024)
 #define OFFSET 1
+#define DIM2 8
 
 /*struct aligned_buffer {
   char garbage[0];
   elem_t data[DIM][DIM];
 } __attribute__((__packed__));*/
 
+void printMatrixInAligned(elem_t data[DIM2][DIM2]){
+  for (int i = 0; i < DIM2; i++)
+  {
+    for (int j = 0; j < DIM2; j++)
+    {
+      printf("%f ", data[i][j]);
+    }
+    printf("\n");
+  }
+}
+
 struct offset_buffer {
   elem_t garbage[OFFSET];
-  elem_t data[DIM][DIM];
+  elem_t data[DIM2][DIM2];
 } __attribute__((__packed__));
 
 int main() {
@@ -42,33 +54,33 @@ int main() {
       Out.garbage[i] = 1;
   }
 
-  for (size_t i = 0; i < DIM; ++i)
-    for (size_t j = 0; j < DIM; ++j) {
-      In.data[i][j] = i*DIM + j;
+  for (size_t i = 0; i < DIM2; ++i)
+    for (size_t j = 0; j < DIM2; ++j) {
+      In.data[i][j] = i + j;
       Out.data[i][j] = 1;
     }
-
+  printMatrixInAligned(In.data);
+  printf("-----------------------------------------------------------\n");
   gemmini_config_ld(DIM * sizeof(elem_t));
-  gemmini_config_st(DIM * sizeof(elem_t));
+  gemmini_config_st(DIM2* sizeof(elem_t));
 
   // printf("Mvin\n");
-  gemmini_mvin(In.data, 0);
+  gemmini_mvin(In.data, 1);
   // printf("Mvout\n");
   gemmini_mvout(Out.data, 0);
-
+  printMatrixInAligned(Out.data);
   // printf("Fence\n");
   gemmini_fence();
 
-  if (!is_equal(In.data, Out.data)) {
-    printf("Matrix:\n");
-    printMatrix(In.data);
-    printf("Matrix output:\n");
-    printMatrix(Out.data);
-    printf("\n");
+  // if (!is_equal(In.data, Out.data)) {
+  //   printf("Matrix:\n");
+  //   printMatrix(In.data);
+  //   printf("Matrix output:\n");
+  //   printMatrix(Out.data);
+  //   printf("\n");
 
-    exit(1);
-  }
+  //   exit(1);
+  // }
 
   exit(0);
 }
-

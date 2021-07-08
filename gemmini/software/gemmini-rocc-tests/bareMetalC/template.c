@@ -18,8 +18,6 @@ int main() {
     }
 #endif
 
-
-  //printf("This is the YWT test for docker\n");
   printf("Flush Gemmini TLB of stale virtual addresses\n");
   gemmini_flush(0);
 
@@ -30,8 +28,7 @@ int main() {
   elem_t Identity[DIM][DIM];
   for (size_t i = 0; i < DIM; i++)
     for (size_t j = 0; j < DIM; j++)
-	Identity[i][j] = i == j;
-  	
+      Identity[i][j] = i == j;
 
   printf("Calculate the scratchpad addresses of all our matrices\n");
   printf("  Note: The scratchpad is \"row-addressed\", where each address contains one matrix row\n");
@@ -74,4 +71,3 @@ int main() {
   printf("Input and output matrices are identical, as expected\n");
   exit(0);
 }
-
