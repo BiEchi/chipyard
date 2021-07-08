@@ -332,6 +332,11 @@ int main() {
   static elem_t final_encoder_output[DIM_I][DIM_K];
 
 
+
+  
+  
+
+
   gemmini_fence();  // system func
   exit(0);
 }
