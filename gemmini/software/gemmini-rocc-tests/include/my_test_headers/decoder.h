@@ -11,10 +11,11 @@
 
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
+#include "include/gemmini.h"
 #include "./auxiliary.h"
 
 
-void decoder()
+void decoder(enum tiled_matmul_type_t accel_type)
 {
   return;
 }

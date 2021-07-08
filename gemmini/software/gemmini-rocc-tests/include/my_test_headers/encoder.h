@@ -11,10 +11,11 @@
 
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
+#include "include/gemmini.h"
 #include "./auxiliary.h"
 
 
-void encoder(elem_t word_vector0[DIM_I][DIM_K], int accel_type)
+void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_type)
 {
   uint64_t start,end; 
   printf("\n");
