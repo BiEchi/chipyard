@@ -102,7 +102,7 @@ long exp_cal(int n, long x)
   return partial;
 }
 
-void positional_embedding(elem_t word_mat[length][dimension])
+void positional_embedding(int length, int dimension, elem_t word_mat[length][dimension])
 {
   // word_mat = (int **)malloc(length*sizeof(elem_t*));
   // for (int i = 0; i < length; i++)
