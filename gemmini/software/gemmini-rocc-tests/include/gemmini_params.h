@@ -14,7 +14,7 @@
 #define MAX_BLOCK_LEN (MAX_BYTES/(DIM*1))
 #define MAX_BLOCK_LEN_ACC (MAX_BYTES/(DIM*4))
 
-typedef int16_t elem_t;
+typedef int8_t elem_t;
 static const elem_t elem_t_max = 127;
 static const elem_t elem_t_min = -128;
 typedef int32_t acc_t;
