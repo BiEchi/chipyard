@@ -5,13 +5,14 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "math.h"  // BUGGY
 
 #ifndef BAREMETAL
 #include <sys/mman.h>
-#endif
+#endif // system func
+
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
-#include "math.h"
 
 #define DIM_I 64
 #define DIM_J 32
@@ -192,15 +193,15 @@ int main()
   start = read_cycles();
   for (int count = 0; count < n_head; count++)
   {
-    tiled_matmul_auto(DIM_I, DIM_I, DIM_K,
-                      (elem_t *)z_qs[count], (elem_t *)z_ks[count], NULL, (elem_t *)temp_qk[count],
-                      DIM_K, DIM_I, DIM_I, DIM_I,
-                      MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-                      NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-                      false, true,
-                      false, false,
-                      3,
-                      WS);
+  tiled_matmul_auto(DIM_I, DIM_I, DIM_K,
+            (elem_t*)z_qs[count], (elem_t*)z_ks[count], NULL, (elem_t*)temp_qk[count],
+            DIM_K,DIM_I, DIM_I, DIM_I,
+            MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+            NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+            false, true,
+            false, false,
+            3,
+            WS);
   }
   end = read_cycles();
   printf("Time for Q*K^T: %d\n", end - start);
@@ -265,7 +266,7 @@ int main()
   static elem_t id_mat_z[DIM_K][DIM_K];
   for (size_t i = 0; i < DIM_K; i++)
     for (size_t j = 0; j < DIM_K; j++)
-      id_mat_z[i][j] = i == j;
+	id_mat_z[i][j] = (i == j);
   start = read_cycles();
   tiled_matmul_auto(DIM_I, DIM_K, DIM_K,
                     (elem_t *)final_z_mat, (elem_t *)id_mat_z, (elem_t *)z_vector, (elem_t *)added_z_mat,
@@ -307,11 +308,12 @@ int main()
                     3,
                     WS);
   end = read_cycles();
-  printf("Time for add & normalization after FC: %d\n", end - start);
+  printf("Time for add & normalization after Fully Connected Layer: %d\n",end-start);
 
   // add and normalize(normalization part), unfinished
   static elem_t final_encoder_output[DIM_I][DIM_K];
 
-  gemmini_fence();
+
+  gemmini_fence();  // system func
   exit(0);
 }

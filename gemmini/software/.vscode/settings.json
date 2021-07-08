@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.S": "platformio-debug.asm",
+        "*.asm": "mips",
+        "gemmini_testutils.h": "c"
+    }
+}
