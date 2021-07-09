@@ -3,10 +3,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-<<<<<<< HEAD
-#include "math.h"
-=======
->>>>>>> 4f68475dcc415350a8aa644f5f3e19c99d4f3b74
 
 #ifndef BAREMETAL
 #include <sys/mman.h>

@@ -101,9 +101,8 @@ long exp_cal(int n, long x)
   return partial;
 }
 
-<<<<<<< HEAD
 // this code is borrowed from https://ourcodeworld.com/articles/read/884/how-to-get-the-square-root-of-a-number-without-using-the-sqrt-function-in-c
-void my_sqrt(float number)
+float my_sqrt(float number)
 {
   float temp, sqrt;
   sqrt = number / 2;
@@ -111,6 +110,8 @@ void my_sqrt(float number)
   while(sqrt != temp){
     temp = sqrt;
     sqrt = ( number/temp + temp) / 2;
+  }
+  return sqrt;
 }
 
 void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
@@ -122,8 +123,8 @@ void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
   beta = 0;
   epsilon = 0.05;
 
-  elem_t mean_value[i];
-  elem_t square_deviation[i];
+  elem_t mean_value[dim_i];
+  elem_t square_deviation[dim_i];
   for (size_t i = 0; i < dim_i; i++)
   {
     size_t sum = 0;
@@ -153,8 +154,6 @@ void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
   return;
 }
 
-void add_normalize(size_t dim_i,size_t dim_j,elem_t* mat_a,elem_t* mat_b,elem_t* added_mat)
-=======
 double sinfunc(double x)
 {
   printf("sin function\n");
@@ -169,6 +168,8 @@ double sinfunc(double x)
   }
   return sum;
 }
+
+
 
 double cosfunc(double x)
 {
@@ -271,7 +272,6 @@ void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_
   return;
 }
 void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, elem_t *added_mat)
->>>>>>> 4f68475dcc415350a8aa644f5f3e19c99d4f3b74
 {
   elem_t id_mat[dim_j][dim_j];
   for (size_t i = 0; i < dim_j; i++)
@@ -280,20 +280,6 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
   u_int64_t start, end;
   start = read_cycles();
   tiled_matmul_auto(dim_i, dim_j, dim_j,
-<<<<<<< HEAD
-            (elem_t*)mat_a, (elem_t*)id_mat, (elem_t*)mat_b, (elem_t*)added_mat,
-            dim_j,dim_j, dim_j, dim_j,
-            MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-            NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-            false, false,
-            false, true,
-            3,
-            WS);
-  // change added_mat in function normalize()
-  layer_normalization(dim_i, dim_j, added_mat);
-  end=read_cycles();
-  printf("Time for add & normalization: %d\n",end-start);
-=======
                     (elem_t *)mat_a, (elem_t *)id_mat, (elem_t *)mat_b, (elem_t *)added_mat,
                     dim_j, dim_j, dim_j, dim_j,
                     MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
@@ -304,7 +290,6 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
                     WS);
   end = read_cycles();
   printf("Time for add & normalization: %d\n", end - start);
->>>>>>> 4f68475dcc415350a8aa644f5f3e19c99d4f3b74
 }
 
 #endif /* AUX_H */
