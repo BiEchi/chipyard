@@ -33,6 +33,15 @@ int main() {
   encoder(word_vector0);
   decoder();
 
+
+
+
+
+
+
+
+
+
   gemmini_fence();  // system func
   exit(0);
 }
