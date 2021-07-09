@@ -203,6 +203,8 @@ int main() {
 
             exit(1);
         }
+      printf("round %d\n",(activation*4+shift/4+1));
+      printMatrix(A[0]);
     }
   }
 
