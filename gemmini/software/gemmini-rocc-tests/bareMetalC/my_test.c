@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "math.h"  // BUGGY
+#include <math.h>
 
 #ifndef BAREMETAL
 #include <sys/mman.h>
@@ -31,12 +31,10 @@ int main() {
 
   gemmini_flush(0);
 
-
-
-
-
   /***** YOUR CODE STARTS HERE *****/
 
+  // test on math.h -> exp()
+  
   static elem_t word_vector0[DIM_I][DIM_K] row_align(1) = {5};
   enum tiled_matmul_type_t acceleration_type;
   

@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "math.h"  // BUGGY
+#include "math.h"
 
 #ifndef BAREMETAL
 #include <sys/mman.h>

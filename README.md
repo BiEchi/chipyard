@@ -22,7 +22,7 @@ docker run -it --name=chipyard-transformer \
 | `math.h` header file.               | Hao BAI     | 0         |
 | `softmax()` implementation.         | Liyang QIAN | 3         |
 | `normalize()` implementation.       | Liyang QIAN | 3         |
-| `WS/OS/CPU` choices implementation. | Hao BAI     | 0         |
+| `WS/OS/CPU` choices implementation. | Hao BAI     | DONE      |
 | `sin()` for positional encoding.    | Liyang QIAN | 3         |
 | `decoder()` part.                   | Wentao YAO  | 3         |
 
