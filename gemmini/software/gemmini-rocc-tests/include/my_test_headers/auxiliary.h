@@ -5,9 +5,6 @@
 #include <stddef.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include "math.h" // BUGGY
-
 #ifndef BAREMETAL
 #include <sys/mman.h>
 #endif // system func
@@ -102,13 +99,9 @@ long exp_cal(int n, long x)
   return partial;
 }
 
-void positional_embedding(int length, int dimension, elem_t word_mat[length][dimension])
+// 对原来的字矩阵直接进行position embedding，不保留原数据
+void positional_embedding(size_t length, size_t dimension, elem_t positional_mat[length][dimension])
 {
-  // word_mat = (int **)malloc(length*sizeof(elem_t*));
-  // for (int i = 0; i < length; i++)
-  // {
-  //   word_mat[i] = (int*)malloc(dimension*sizeof(elem_t));
-  // }
   // 生成位置矩阵
   if (dimension % 2 == 0)
   {
@@ -116,8 +109,8 @@ void positional_embedding(int length, int dimension, elem_t word_mat[length][dim
     {
       for (int i = 0; i < dimension; i += 2)
       {
-        word_mat[pos][i] += sin(pos / pow(10000, 2 * i / dimension));
-        word_mat[pos][i + 1] += cos(pos / pow(10000, (2 * i + 1) / dimension));
+        positional_mat[pos][i] = sinfunc(pos / pow(10000, 2 * i / dimension));
+        positional_mat[pos][i + 1] = cosfunc(pos / pow(10000, (2 * i + 1) / dimension));
       }
     }
   }
@@ -127,12 +120,45 @@ void positional_embedding(int length, int dimension, elem_t word_mat[length][dim
     {
       for (int i = 0; i < dimension - 1; i += 2)
       {
-        word_mat[pos][i] += sin(pos / pow(10000, 2 * i / dimension));
-        word_mat[pos][i + 1] += cos(pos / pow(10000, (2 * i + 1) / dimension));
+        positional_mat[pos][i] = sinfunc(pos / pow(10000, 2 * i / dimension));
+        positional_mat[pos][i + 1] = cosfunc(pos / pow(10000, (2 * i + 1) / dimension));
       }
-      word_mat[pos][dimension-1] += sin(pos/pow(10000,2*(dimension - 1)/dimension));
+      positional_mat[pos][dimension - 1] = sinfunc(pos / pow(10000, 2 * (dimension - 1) / dimension));
     }
   }
+  return;
+}
+
+elem_t row_summary(int column, elem_t *matrixRow)
+{
+  float sum = 0;
+  for (int i = 0; i < column; i++)
+  {
+    sum += *(matrixRow + i);
+  }
+  return sum;
+}
+
+// generate the softmax result
+void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][row])
+{
+  // change the value into exp weight
+  for (int rowNum = 0; rowNum < row; rowNum++)
+  {
+    for (int columnNum = 0; columnNum < column; columnNum++)
+    {
+      objectMat[rowNum][columnNum] = exp_cal(10, objectMat[rowNum][columnNum] / sqrt(weightDim));
+    }
+  }
+  for (int rowNum = 0; rowNum < row; rowNum++)
+  {
+    elem_t row_sum = row_summary(column, (elem_t *)objectMat[rowNum]);
+    for (int columnNum = 0; columnNum < column; columnNum++)
+    {
+      softmaxResultMat[rowNum][columnNum] = objectMat[rowNum][columnNum] / row_sum;
+    }
+  }
+  printf("hello world");
   return;
 }
 

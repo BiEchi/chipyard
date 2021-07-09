@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "math.h": "c",
+        "gemmini_nn.h": "c",
+        "stdlib.h": "c",
+        "libc-header-start.h": "c",
+        "encoder.h": "c",
+        "auxiliary.h": "c"
+    }
+}
