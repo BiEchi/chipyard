@@ -28,6 +28,12 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_t
   static elem_t z_ks[n_head][DIM_I][DIM_J];
   static elem_t z_vs[n_head][DIM_I][DIM_J];
 
+  // elem_t templ1[2][3];
+  // elem_t templ2[2][3];
+  // elem_t templ3[2][3];
+  // add_normalize(2,3,(elem_t*)templ1,(elem_t*)templ2,(elem_t*)templ3);
+  // print_matrix(2,3,(elem_t*)templ3);
+
 
 
 

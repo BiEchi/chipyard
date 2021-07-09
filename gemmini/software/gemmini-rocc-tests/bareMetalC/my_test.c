@@ -48,6 +48,7 @@ int main() {
   // encoder(word_vector0, acceleration_type=OS);
   // decoder(acceleration_type=OS);
 
+
   printf("\n\n***** These tests are carried out by CPU MatMul Case *****");
   encoder(word_vector0, acceleration_type=CPU);
   decoder(acceleration_type=CPU);
