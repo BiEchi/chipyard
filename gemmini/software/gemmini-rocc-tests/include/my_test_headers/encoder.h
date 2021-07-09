@@ -28,6 +28,9 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_t
   static elem_t z_ks[n_head][DIM_I][DIM_J];
   static elem_t z_vs[n_head][DIM_I][DIM_J];
 
+
+
+
   /*====================Transformer Encoder======================*/
 
   // positional embedding
@@ -44,7 +47,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_t
             MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
             NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
             false, false,
-            false, false,
+            false, true,
             3,
             accel_type);
   end = read_cycles();
@@ -164,30 +167,10 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_t
   end = read_cycles();
   printf("Time for multihead attention: %d\n",end-start);
   
-  // add and normalize(add part)
-  static elem_t added_z_mat[DIM_I][DIM_K];
-  static elem_t id_mat_z[DIM_K][DIM_K];
-  for (size_t i = 0; i < DIM_K; i++)
-    for (size_t j = 0; j < DIM_K; j++)
-	id_mat_z[i][j] = (i == j);
-  start = read_cycles();
-  tiled_matmul_auto(DIM_I, DIM_K, DIM_K,
-            (elem_t*)final_z_mat, (elem_t*)id_mat_z, (elem_t*)z_vector, (elem_t*)added_z_mat,
-            DIM_K,DIM_K, DIM_K, DIM_K,
-            MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-            NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-            false, false,
-            false, false,
-            3,
-            accel_type); 
-  
-  // add and normalize(normalization part), unfinished
+  // add and normalize
+
   static elem_t normalized_z_mat[DIM_I][DIM_K];
-
-
-
-  end =read_cycles();
-  printf("Time for add&normalization: %d\n",end-start);
+  add_normalize(DIM_I,DIM_K,(elem_t*)final_z_mat,(elem_t*)word_vector,(elem_t*)normalized_z_mat);
 
   // fully connected layer1 
   static elem_t fc_weight1[DIM_K][DIM_K];
@@ -201,22 +184,16 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_t
   printf("Time for fc_layer: %d\n",end-start);
 
   // add & normalization after FC(add part)
-  static elem_t encoder_out[DIM_I][DIM_K];
-  start = read_cycles();
-  tiled_matmul_auto(DIM_I, DIM_K, DIM_K,
-            (elem_t*)fc_result1, (elem_t*)id_mat_z, (elem_t*)normalized_z_mat, (elem_t*)encoder_out,
-            DIM_K,DIM_K, DIM_K, DIM_K,
-            MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-            NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-            false, false,
-            false, false,
-            3,
-            accel_type);   
-  end = read_cycles();
-  printf("Time for add & normalization after Fully Connected Layer: %d\n",end-start);
-
-  // add and normalize(normalization part), unfinished
   static elem_t final_encoder_output[DIM_I][DIM_K];
+  add_normalize(DIM_I,DIM_K,(elem_t*)fc_result1,(elem_t*)normalized_z_mat,(elem_t*)final_encoder_output);
+
+
+  // linear layer 
+  
+  tiled_matmul_nn_auto(DIM_I, DIM_K, DIM_K,
+        normalized_z_mat, fc_weight1, NULL, fc_result1,
+        RELU, 0, 0, false,
+        WS, false, "fc_layer1");
 
   return;
 }
