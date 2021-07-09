@@ -6,9 +6,9 @@
 // #define DIM_J 32
 // #define DIM_K 128
 
-#define wordNum 64
-#define wordDim 128
-#define weightDim 16
+#define wordNum 4
+#define wordDim 6
+#define weightDim 5
 
 #define n_head 4
 #endif 

@@ -39,7 +39,6 @@ int main() {
 
   static elem_t word_vector0[wordNum][wordDim] row_align(1) = {5};
   enum tiled_matmul_type_t acceleration_type;
-  printf("now we start test\n");
   printf("\n\n***** These tests are carried out by WS MatMul Case *****");
   encoder(word_vector0, acceleration_type=WS);
   decoder(acceleration_type=WS);
