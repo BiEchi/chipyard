@@ -56,15 +56,6 @@ int main() {
 
   /***** DO NOT CHANGE CONTENT BELOW *****/
 
-
-
-
-
-
-
-
-
-
   gemmini_fence();  // system func
   exit(0);
 }

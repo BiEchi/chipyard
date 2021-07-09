@@ -102,6 +102,57 @@ long exp_cal(int n,long x)
   return partial;
 }
 
+// this code is borrowed from https://ourcodeworld.com/articles/read/884/how-to-get-the-square-root-of-a-number-without-using-the-sqrt-function-in-c
+void my_sqrt(float number)
+{
+  float temp, sqrt;
+  sqrt = number / 2;
+  temp = 0;
+  while(sqrt != temp){
+    temp = sqrt;
+    sqrt = ( number/temp + temp) / 2;
+}
+
+void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
+{
+  long alpha, beta, epsilon;
+
+  /***** SUPER-PERIMETERS *****/
+  alpha = 1;
+  beta = 0;
+  epsilon = 0.05;
+
+  elem_t mean_value[i];
+  elem_t square_deviation[i];
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    size_t sum = 0;
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      sum += added_mat[dim_i*i + j];
+    }
+    mean_value[i] = sum / dim_j;
+  }
+
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      square_deviation[i] += (added_mat[dim_i*i + j] - mean_value[i]) * (added_mat[dim_i*i + j] - mean_value[i]);
+    }
+  }
+
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      added_mat[dim_i*i + j] = alpha * (added_mat[dim_i*i + j] - mean_value[i]) / (my_sqrt(square_deviation[i] + epsilon)) + beta;
+    }
+  }
+  
+  return;
+}
+
 void add_normalize(size_t dim_i,size_t dim_j,elem_t* mat_a,elem_t* mat_b,elem_t* added_mat)
 {
   elem_t id_mat[dim_j][dim_j];
@@ -118,7 +169,9 @@ void add_normalize(size_t dim_i,size_t dim_j,elem_t* mat_a,elem_t* mat_b,elem_t*
             false, false,
             false, true,
             3,
-            WS); 
+            WS);
+  // change added_mat in function normalize()
+  layer_normalization(dim_i, dim_j, added_mat);
   end=read_cycles();
   printf("Time for add & normalization: %d\n",end-start);
 }

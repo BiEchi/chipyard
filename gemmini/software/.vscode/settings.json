@@ -11,6 +11,7 @@
         "gemmini.h": "c",
         "mman.h": "c",
         "math.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "cmath": "cpp"
     }
 }
