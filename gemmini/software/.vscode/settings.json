@@ -7,6 +7,11 @@
         "encoder.h": "c",
         "stdlib.h": "c",
         "gemmini_nn.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "gemmini.h": "c",
+        "mman.h": "c",
+        "math.h": "c",
+        "stdio.h": "c",
+        "cmath": "cpp"
     }
 }

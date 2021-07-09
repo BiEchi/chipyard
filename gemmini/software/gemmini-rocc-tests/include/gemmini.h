@@ -4951,4 +4951,3 @@ static void tiled_global_average_auto(const elem_t * input, elem_t * output,
 #undef abs
 
 #endif // SRC_MAIN_C_GEMMINI_H
-

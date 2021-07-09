@@ -179,14 +179,16 @@ int main() {
         BATCH_SIZE, IN_DIM, IN_CHANNELS,
         OUT_CHANNELS, OUT_DIM,
         STRIDE, 1, 1, PADDING, KERNEL_DIM,
-        false, TRANS_OUTPUT_1203, TRANS_INPUT_3120, TRANS_WEIGHT_1203, TRANS_WEIGHT_0132,
+        false, TRANS_OUTPUT_1203, TRANS_INPUT_3120, 
+        TRANS_WEIGHT_1203, TRANS_WEIGHT_0132,
 
         (elem_t*)input,
         (elem_t*)weights_mat,
         NO_BIAS ? NULL : (acc_t*)bias,
         (elem_t*)output_mat,
 
-        NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, 0, 0, 0,
+        NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, 
+        0, 0, 0,
 
         WS);
     uint64_t end_gemmini = read_cycles();

@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "math.h"  // BUGGY
 
 #ifndef BAREMETAL
 #include <sys/mman.h>
@@ -17,32 +16,28 @@
 #include "include/my_test_headers/decoder.h"
 #include "include/my_test_headers/encoder.h"
 
+int main()
+{
 
-int main() {
-  
   /***** DO NOT CHANGE CONTENT BELOW *****/
 
 #ifndef BAREMETAL
-    if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
-      perror("mlockall failed");
-      exit(1);
-    }
+  if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0)
+  {
+    perror("mlockall failed");
+    exit(1);
+  }
 #endif
 
   gemmini_flush(0);
 
-
-
-
-
   /***** YOUR CODE STARTS HERE *****/
 
-  static elem_t word_vector0[DIM_I][DIM_K] row_align(1) = {5};
+  static elem_t word_vector0[wordNum][wordDim] row_align(1) = {5};
   enum tiled_matmul_type_t acceleration_type;
-  
   printf("\n\n***** These tests are carried out by WS MatMul Case *****");
-  encoder(word_vector0, acceleration_type=WS);
-  decoder(acceleration_type=WS);
+  encoder(word_vector0, acceleration_type = WS);
+  decoder(acceleration_type = WS);
 
   printf("\n\n***** These tests are carried out by OS MatMul Case *****");
   // encoder(word_vector0, acceleration_type=OS);
@@ -50,24 +45,11 @@ int main() {
 
 
   printf("\n\n***** These tests are carried out by CPU MatMul Case *****");
-  encoder(word_vector0, acceleration_type=CPU);
-  decoder(acceleration_type=CPU);
-
-
-
-
+  encoder(word_vector0, acceleration_type = CPU);
+  decoder(acceleration_type = CPU);
 
   /***** DO NOT CHANGE CONTENT BELOW *****/
 
-
-
-
-
-
-
-
-
-
-  gemmini_fence();  // system func
+  gemmini_fence(); // system func
   exit(0);
 }
