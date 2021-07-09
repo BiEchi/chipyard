@@ -11,10 +11,11 @@
 
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
+#include "include/gemmini.h"
 #include "./auxiliary.h"
 
 
-void encoder(elem_t word_vector0[DIM_I][DIM_K])
+void encoder(elem_t word_vector0[DIM_I][DIM_K], enum tiled_matmul_type_t accel_type)
 {
   uint64_t start,end; 
   printf("\n");
@@ -48,7 +49,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, true,
             3,
-            WS);
+            accel_type);
   end = read_cycles();
   printf("Time for positional encoding: %d\n",end-start);
 
@@ -65,7 +66,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, false,
             3,
-            WS);
+            accel_type);
     tiled_matmul_auto(DIM_I, DIM_J, DIM_K,
             (elem_t*)word_vector, (elem_t*) k_mats[count], NULL, (elem_t*)z_ks[count],
             DIM_K,DIM_J, DIM_J, DIM_J,
@@ -74,7 +75,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, false,
             3,
-            WS);
+            accel_type);
     tiled_matmul_auto(DIM_I, DIM_J, DIM_K,
             (elem_t*)word_vector, (elem_t*) v_mats[count], NULL, (elem_t*)z_vs[count],
             DIM_K,DIM_J, DIM_J, DIM_J,
@@ -83,7 +84,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, false,
             3,
-            WS);
+            accel_type);
   }
   end =read_cycles();
   printf("Time for get Q K V matrix: %d\n",end-start);
@@ -101,7 +102,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, true,
             false, false,
             3,
-            WS);
+            accel_type);
   }
   end = read_cycles();
   printf("Time for Q*K^T: %d\n",end-start);
@@ -130,7 +131,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, false,
             3,
-            WS); 
+            accel_type); 
   }  
   end =read_cycles();
   printf("Time for softmax(Q*K^T)*V: %d\n",end-start);
@@ -162,7 +163,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
             false, false,
             false, false,
             3,
-            WS); 
+            accel_type); 
   end = read_cycles();
   printf("Time for multihead attention: %d\n",end-start);
   
@@ -178,7 +179,7 @@ void encoder(elem_t word_vector0[DIM_I][DIM_K])
   tiled_matmul_nn_auto(DIM_I, DIM_K, DIM_K,
         normalized_z_mat, fc_weight1, NULL, fc_result1,
         RELU, 0, 0, false,
-        WS, false, "fc_layer1");
+        accel_type, false, "fc_layer1");
   end = read_cycles();
   printf("Time for fc_layer: %d\n",end-start);
 

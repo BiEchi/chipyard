@@ -14,10 +14,11 @@
 
 #include "include/gemmini_testutils.h"
 #include "include/gemmini_nn.h"
+#include "include/gemmini.h"
 #include "./auxiliary.h"
 
 
-void decoder()
+void decoder(enum tiled_matmul_type_t accel_type)
 {
   static elem_t q_weights[n_head][DIM_K][DIM_J];
   static elem_t k_weights[n_head][DIM_K][DIM_J];

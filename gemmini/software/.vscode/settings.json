@@ -5,6 +5,8 @@
         "gemmini_testutils.h": "c",
         "decoder.h": "c",
         "encoder.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "gemmini_nn.h": "c",
+        "type_traits": "c"
     }
 }
