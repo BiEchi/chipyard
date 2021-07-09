@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "math.h" // BUGGY
 
 #ifndef BAREMETAL
 #include <sys/mman.h>
@@ -185,6 +184,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   // add and normalize(normalization part), unfinished
   static elem_t normalized_z_mat[wordNum][wordDim];
 
+  add_normalize(wordDim,wordDim,(elem_t*)final_z_mat,(elem_t*)word_vector,(elem_t*)normalized_z_mat);
   end = read_cycles();
   printf("Time for add&normalization: %d\n", end - start);
 
@@ -200,22 +200,16 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   printf("Time for fc_layer: %d\n", end - start);
 
   // add & normalization after FC(add part)
-  static elem_t encoder_out[wordNum][wordDim];
-  start = read_cycles();
-  tiled_matmul_auto(wordNum, wordDim, wordDim,
-                    (elem_t *)fc_result1, (elem_t *)id_mat_z, (elem_t *)normalized_z_mat, (elem_t *)encoder_out,
-                    wordDim, wordDim, wordDim, wordDim,
-                    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-                    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-                    false, false,
-                    false, false,
-                    3,
-                    accel_type);
-  end = read_cycles();
-  printf("Time for add & normalization after Fully Connected Layer: %d\n", end - start);
+  static elem_t final_encoder_output[wordDim][wordDim];
+  add_normalize(wordNum,wordDim,(elem_t*)fc_result1,(elem_t*)normalized_z_mat,(elem_t*)final_encoder_output);
 
-  // add and normalize(normalization part), unfinished
-  static elem_t final_encoder_output[wordNum][wordDim];
+
+  // linear layer 
+  
+  tiled_matmul_nn_auto(wordDim, wordDim, wordDim,
+        normalized_z_mat, fc_weight1, NULL, fc_result1,
+        RELU, 0, 0, false,
+        WS, false, "fc_layer1");
 
   return;
 }
