@@ -32,7 +32,7 @@ int main()
   gemmini_flush(0);
 
   /***** YOUR CODE STARTS HERE *****/
-
+  printf("start test\n");
   static elem_t word_vector0[wordNum][wordDim] row_align(1) = {5};
   enum tiled_matmul_type_t acceleration_type;
   printf("\n\n***** These tests are carried out by WS MatMul Case *****");

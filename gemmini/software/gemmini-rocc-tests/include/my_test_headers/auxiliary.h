@@ -183,39 +183,57 @@ void positional_embedding(size_t length, size_t dimension, elem_t positional_mat
   return;
 }
 
-elem_t row_summary(int column, elem_t *matrixRow)
+void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_vector)
 {
   printf("row sum\n");
-  float sum = 0;
+  // tiled_matmul_auto((size_t)1, (size_t)1, (size_t)column,
+  //                   matrixRow, allOne_vector,
+  //                   NULL, result,
+  //                   (size_t)column, (size_t)1, (size_t)1, (size_t)1,
+  //                   MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+  //                   NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+  //                   false, true,
+  //                   false, false,
+  //                   3,
+  //                   WS);
   for (int i = 0; i < column; i++)
   {
-    sum += *(matrixRow + i);
+    result += *(matrixRow + i);
   }
-  return sum;
+  return;
 }
 
 // generate the softmax result
-void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][row])
+void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][column])
 {
   printf("softmax function\n");
-  // change the value into exp weight
-  for (int rowNum = 0; rowNum < row; rowNum++)
+  elem_t allOne_vector[column];
+  for (int i = 0; i < column; i++)
   {
-    for (int columnNum = 0; columnNum < column; columnNum++)
+    allOne_vector[i] = 1;
+  }
+
+  // change the value into exp weight
+  for (int rowId = 0; rowId < row; rowId++)
+  {
+    for (int columnId = 0; columnId < column; columnId++)
     {
-      objectMat[rowNum][columnNum] = exp_cal(10, objectMat[rowNum][columnNum] / CarmSqrt(weightDim));
+      objectMat[rowId][columnId] = exp_cal(10, objectMat[rowId][columnId] / CarmSqrt(weightDim));
     }
   }
-  for (int rowNum = 0; rowNum < row; rowNum++)
+
+  for (int rowId = 0; rowId < row; rowId++)
   {
-    elem_t row_sum = row_summary(column, (elem_t *)objectMat[rowNum]);
-    for (int columnNum = 0; columnNum < column; columnNum++)
+    elem_t row_sum;
+    row_summary(column, objectMat[rowId], row_sum, allOne_vector);
+    for (int columnId = 0; columnId < column; columnId++)
     {
-      softmaxResultMat[rowNum][columnNum] = objectMat[rowNum][columnNum] / row_sum;
+      softmaxResultMat[rowId][columnId] = objectMat[rowId][columnId] / row_sum;
     }
   }
   return;
 }
+
 void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, elem_t *added_mat)
 {
   elem_t id_mat[dim_j][dim_j];
