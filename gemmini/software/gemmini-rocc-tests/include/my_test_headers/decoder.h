@@ -37,6 +37,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
     for (size_t j = 0; j < wordDim; j++)
       id_word[i][j] = i == j;
   start = read_cycles();
+  positional_embedding(wordNum, wordDim, positions);
   tiled_matmul_auto(wordNum, wordDim, wordDim,
                     (elem_t *)last_output, (elem_t *)id_word, (elem_t *)positions, (elem_t *)positioned_word,
                     wordDim, wordDim, wordDim, wordDim,
@@ -143,7 +144,10 @@ void decoder(enum tiled_matmul_type_t accel_type)
   //softmax(Q*K^T),unfinished
   static elem_t softmax_qk[n_head][wordNum][wordNum];
   start = read_cycles();
-
+  for (int count = 0; count < n_head; count++)
+  {
+    softmaxFunc(wordDim, wordDim, masked_qk[count], softmax_qk[count]);
+  }
   end = read_cycles();
   printf("Time for decoder softmax(Q*K^T): %d\n", end - start);
 
@@ -262,6 +266,10 @@ void decoder(enum tiled_matmul_type_t accel_type)
   //softmax(Q*K^T),unfinished
   static elem_t softmax_qk2[n_head][wordNum][wordNum];
   start = read_cycles();
+  for (int count = 0; count < n_head; count++)
+  {
+    softmaxFunc(wordDim, wordDim, temp_qk2[count], softmax_qk2[count]);
+  }
 
   end = read_cycles();
   printf("Time for decoder softmax(Q*K^T): %d\n", end - start);
@@ -345,6 +353,8 @@ void decoder(enum tiled_matmul_type_t accel_type)
                        WS, false, "fc_layer1");
 
   // softmax
+  static elem_t softmax_final[wordDim][n_words];
+  softmaxFunc(wordDim, wordDim, linear_output, softmax_final);
 
   return;
 }

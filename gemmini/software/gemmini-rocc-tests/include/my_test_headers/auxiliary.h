@@ -156,7 +156,7 @@ void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
 
 double sinfunc(double x)
 {
-  printf("sin function\n");
+  //printf("sin function\n");
   double sum = 0, term = 1;
   int n = 1, t = 1;
   while (term >= 1e-5)
@@ -173,7 +173,7 @@ double sinfunc(double x)
 
 double cosfunc(double x)
 {
-  printf("cos function\n");
+  //printf("cos function\n");
   double sum = 0, term = 1;
   int n = 0, t = 1;
   while (term >= 1e-5)
@@ -189,7 +189,7 @@ double cosfunc(double x)
 // fastly calculate sqrt
 float CarmSqrt(float x)
 {
-  printf("sqrt function\n");
+  //printf("sqrt function\n");
   union
   {
     int intPart;
@@ -210,7 +210,7 @@ float CarmSqrt(float x)
 // 对原来的字矩阵直接进行position embedding，不保留原数据
 void positional_embedding(size_t length, size_t dimension, elem_t positional_mat[length][dimension])
 {
-  printf("positional_embedding\n");
+  // printf("positional_embedding\n");
   // 生成位置矩阵
   if (dimension % 2 == 0)
   {
@@ -240,7 +240,7 @@ void positional_embedding(size_t length, size_t dimension, elem_t positional_mat
 
 void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_vector)
 {
-  printf("row sum\n");
+  //printf("row sum\n");
   // tiled_matmul_auto((size_t)1, (size_t)1, (size_t)column,
   //                   matrixRow, allOne_vector,
   //                   NULL, result,
@@ -261,7 +261,7 @@ void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_ve
 // generate the softmax result
 void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][column])
 {
-  printf("softmax function\n");
+  // printf("softmax function\n");
   elem_t allOne_vector[column];
   for (int i = 0; i < column; i++)
   {
