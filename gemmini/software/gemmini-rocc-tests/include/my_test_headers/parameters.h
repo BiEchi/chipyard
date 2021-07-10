@@ -1,7 +1,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
-#include<stdio.h>
-
+#include <stdio.h>
 
 // #define DIM_I 64
 #define wordNum 4
@@ -14,4 +13,6 @@
 
 #define n_head 4
 #define n_words 512
-#endif 
+
+// aux matrix
+#endif

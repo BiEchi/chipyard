@@ -30,6 +30,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   static elem_t word_vector[wordNum][wordDim];
   static elem_t positions[wordNum][wordDim];
   static elem_t id_word[wordDim][wordDim];
+  
   for (size_t i = 0; i < wordDim; i++)
   {
     for (size_t j = 0; j < wordDim; j++)
@@ -39,7 +40,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   }
   // positional embedding
   start = read_cycles();
-  positional_embedding(wordNum,wordDim,positions);
+  positional_embedding(wordNum, wordDim, positions);
   tiled_matmul_auto(wordNum, wordDim, wordDim,
                     (elem_t *)word_vector0, (elem_t *)id_word, (elem_t *)positions, (elem_t *)word_vector,
                     wordDim, wordDim, wordDim, wordDim,
@@ -111,7 +112,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   start = read_cycles();
   for (int count = 0; count < n_head; count++)
   {
-      softmaxFunc(wordNum,wordDim,temp_qk[count],softmaxResultMat[count]);
+    softmaxFunc(wordDim, wordDim, temp_qk[count], softmaxResultMat[count]);
   }
   end = read_cycles();
   printf("Time for softmax(Q*K^T): %d\n", end - start);
@@ -184,7 +185,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   // add and normalize(normalization part), unfinished
   static elem_t normalized_z_mat[wordNum][wordDim];
 
-  add_normalize(wordDim,wordDim,(elem_t*)final_z_mat,(elem_t*)word_vector,(elem_t*)normalized_z_mat);
+  add_normalize(wordDim, wordDim, (elem_t *)final_z_mat, (elem_t *)word_vector, (elem_t *)normalized_z_mat);
   end = read_cycles();
   printf("Time for add&normalization: %d\n", end - start);
 
@@ -201,15 +202,14 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
 
   // add & normalization after FC(add part)
   static elem_t final_encoder_output[wordDim][wordDim];
-  add_normalize(wordNum,wordDim,(elem_t*)fc_result1,(elem_t*)normalized_z_mat,(elem_t*)final_encoder_output);
+  add_normalize(wordNum, wordDim, (elem_t *)fc_result1, (elem_t *)normalized_z_mat, (elem_t *)final_encoder_output);
 
+  // linear layer
 
-  // linear layer 
-  
   tiled_matmul_nn_auto(wordDim, wordDim, wordDim,
-        normalized_z_mat, fc_weight1, NULL, fc_result1,
-        RELU, 0, 0, false,
-        WS, false, "fc_layer1");
+                       normalized_z_mat, fc_weight1, NULL, fc_result1,
+                       RELU, 0, 0, false,
+                       WS, false, "fc_layer1");
 
   return;
 }
