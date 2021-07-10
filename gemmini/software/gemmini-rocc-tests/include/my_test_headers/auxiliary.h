@@ -101,6 +101,59 @@ long exp_cal(int n, long x)
   return partial;
 }
 
+// this code is borrowed from https://ourcodeworld.com/articles/read/884/how-to-get-the-square-root-of-a-number-without-using-the-sqrt-function-in-c
+float my_sqrt(float number)
+{
+  float temp, sqrt;
+  sqrt = number / 2;
+  temp = 0;
+  while(sqrt != temp){
+    temp = sqrt;
+    sqrt = ( number/temp + temp) / 2;
+  }
+  return sqrt;
+}
+
+void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
+{
+  long alpha, beta, epsilon;
+
+  /***** SUPER-PERIMETERS *****/
+  alpha = 1;
+  beta = 0;
+  epsilon = 0.05;
+
+  elem_t mean_value[dim_i];
+  elem_t square_deviation[dim_i];
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    size_t sum = 0;
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      sum += added_mat[dim_i*i + j];
+    }
+    mean_value[i] = sum / dim_j;
+  }
+
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      square_deviation[i] += (added_mat[dim_i*i + j] - mean_value[i]) * (added_mat[dim_i*i + j] - mean_value[i]);
+    }
+  }
+
+  for (size_t i = 0; i < dim_i; i++)
+  {
+    for (size_t j = 0; j < dim_j; j++)
+    {
+      added_mat[dim_i*i + j] = alpha * (added_mat[dim_i*i + j] - mean_value[i]) / (my_sqrt(square_deviation[i] + epsilon)) + beta;
+    }
+  }
+  
+  return;
+}
+
 double sinfunc(double x)
 {
   printf("sin function\n");
@@ -115,6 +168,8 @@ double sinfunc(double x)
   }
   return sum;
 }
+
+
 
 double cosfunc(double x)
 {

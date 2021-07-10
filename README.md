@@ -22,7 +22,7 @@ docker run -it --name=chipyard-transformer \
 | `math.h` header file.               | Hao BAI     | 0         |
 | `softmax()` implementation.         | Liyang QIAN | 3         |
 | `normalize()` implementation.       | Liyang QIAN | 3         |
-| `WS/OS/CPU` choices implementation. | Hao BAI     | 0         |
+| `WS/OS/CPU` choices implementation. | Hao BAI     | DONE      |
 | `sin()` for positional encoding.    | Liyang QIAN | 3         |
 | `decoder()` part.                   | Wentao YAO  | 3         |
 
@@ -33,4 +33,20 @@ docker run -it --name=chipyard-transformer \
 | 9-7-6         | Liyang QIAN |
 | 10-7-6        | Wentao YAO  |
 | 9-5-6 / 9-9-5 | Hao BAI     |
+
+## Working References
+
+### Layer Normalization
+
+In our code, it shows as:
+
+![LayerNormalization](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-07-09-105533.png)
+
+According to our analysis, we gain the formula
+$$
+Layer\ Normalization(x_i)=\alpha\times\frac{x_i-\mu_L}{\sqrt{\sigma_L^2+\epsilon}}+\beta
+$$
+Where $\alpha$, $\beta$ and $\epsilon$ are the super-parameters we deliver to the Layer Normalization Process; $\mu_L$ and $\sigma_L$ are the mean value and standard deviation of the LAYER, and $x_i$ is the value of the $i^{th}$ value of the current layer. To explain in graphs, we have:
+
+![LayerNormalizationDetailed](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-07-09-111223.png)
 
