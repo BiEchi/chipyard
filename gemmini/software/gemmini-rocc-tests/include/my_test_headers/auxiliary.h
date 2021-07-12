@@ -240,23 +240,29 @@ void positional_embedding(size_t length, size_t dimension, elem_t positional_mat
 
 void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_vector)
 {
-  //printf("row sum\n");
-  // tiled_matmul_auto((size_t)1, (size_t)1, (size_t)column,
-  //                   matrixRow, allOne_vector,
-  //                   NULL, result,
-  //                   (size_t)column, (size_t)1, (size_t)1, (size_t)1,
-  //                   MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-  //                   NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-  //                   false, true,
-  //                   false, false,
-  //                   3,
-  //                   WS);
   for (int i = 0; i < column; i++)
   {
     result += *(matrixRow + i);
   }
   return;
 }
+
+// Cannot store the value into mat
+// void row_summary(int column, elem_t *matrixRow, elem_t* result, elem_t *allOne_vector)
+// {
+//   printf("row sum\n");
+//   tiled_matmul_auto(1, 1, column,
+//                     matrixRow, allOne_vector,
+//                     NULL, result,
+//                     column, 1, 1, 1,
+//                     MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+//                     NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+//                     false, true,
+//                     false, false,
+//                     3,
+//                     WS);
+//   return;
+// }
 
 // generate the softmax result
 void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][column])
