@@ -116,15 +116,24 @@ float my_sqrt(float number)
 
 void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
 {
-  long alpha, beta, epsilon;
+  printf("dingbuzhule\n");
+  int alpha, beta, epsilon;
+  printf("dingbuzhule\n");
+  uint64_t start,end;
+  printf("dingbuzhule\n");
+
+  start=read_cycles();
 
   /***** SUPER-PERIMETERS *****/
   alpha = 1;
   beta = 0;
   epsilon = 0.05;
+  printf("dingbuzhule\n");
 
   elem_t mean_value[dim_i];
   elem_t square_deviation[dim_i];
+  printf("dingbuzhule\n");
+
   for (size_t i = 0; i < dim_i; i++)
   {
     size_t sum = 0;
@@ -134,6 +143,7 @@ void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
     }
     mean_value[i] = sum / dim_j;
   }
+  printf("dingbuzhule\n");
 
   for (size_t i = 0; i < dim_i; i++)
   {
@@ -150,7 +160,8 @@ void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
       added_mat[dim_i*i + j] = alpha * (added_mat[dim_i*i + j] - mean_value[i]) / (my_sqrt(square_deviation[i] + epsilon)) + beta;
     }
   }
-  
+  end = read_cycles();
+  printf("Time for normalization: %d\n",end-start);
   return;
 }
 
@@ -289,6 +300,30 @@ void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_
   return;
 }
 
+void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_a, elem_t *mat_b, elem_t *normalized_mat,elem_t* mat_d)
+{
+  elem_t id_mat[dim_j][dim_j];
+  for (size_t i = 0; i < dim_j; i++)
+    for (size_t j = 0; j < dim_j; j++)
+      id_mat[i][j] = (i == j);
+  u_int64_t start, end;
+  start = read_cycles();
+  tiled_matmul_auto(dim_i, dim_j, dim_k,
+                    mat_a, mat_b, mat_d, normalized_mat,
+                    dim_k, dim_j, dim_j, dim_j,
+                    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+                    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+                    false, false,
+                    false, true,
+                    3,
+                    WS);
+
+  layer_normalization(dim_i,dim_j,normalized_mat);
+  end = read_cycles();
+  printf("Time for add & normalization: %d\n", end - start);
+}
+
+
 void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, elem_t *added_mat)
 {
   elem_t id_mat[dim_j][dim_j];
@@ -306,6 +341,7 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
                     false, true,
                     3,
                     WS);
+  // layer_normalization(dim_i,dim_j,added_mat);
   end = read_cycles();
   printf("Time for add & normalization: %d\n", end - start);
 }

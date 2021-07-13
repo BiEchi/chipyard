@@ -20,6 +20,8 @@ int main()
 {
 
 
+
+
   /***** DO NOT CHANGE CONTENT BELOW *****/
 
 #ifndef BAREMETAL
@@ -31,7 +33,6 @@ int main()
 #endif
 
   gemmini_flush(0);
-
   /***** YOUR CODE STARTS HERE *****/
   printf("start test\n");
   static elem_t word_vector0[wordNum][wordDim] row_align(1) = {5};
