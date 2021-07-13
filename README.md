@@ -36,6 +36,9 @@ docker run -it --name=chipyard-transformer \
 | `vector_ALU` implementation             | Hao BAI     | 3         | START   |
 | `pipeline_multiplicator` implementation | Liyang QIAN | 4         | START   |
 
+### Verliog Learing Web
+https://hdlbits.01xz.net/wiki/Main_Page
+
 ## FIXME
 
 | FIXME                         | Executer    | Day SPENT | STATUS |
