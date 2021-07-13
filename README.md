@@ -15,16 +15,33 @@ docker run -it --name=chipyard-transformer \
 --mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer
 ```
 
-## Things TODO
+## TODO
 
-| TODO                                | Executer    | Day SPENT |
-| ----------------------------------- | ----------- | --------- |
-| `math.h` header file.               | Hao BAI     | 0         |
-| `softmax()` implementation.         | Liyang QIAN | 3         |
-| `normalize()` implementation.       | Liyang QIAN | 3         |
-| `WS/OS/CPU` choices implementation. | Hao BAI     | DONE      |
-| `sin()` for positional encoding.    | Liyang QIAN | 3         |
-| `decoder()` part.                   | Wentao YAO  | 3         |
+### Software (by *C*)
+
+| TODO                                | Executer    | Day SPENT | PROCESS |
+| ----------------------------------- | ----------- | --------- | ------- |
+| `math.h` header file.               | Hao BAI     | 0         | DONE    |
+| `softmax()` implementation.         | Liyang QIAN | 3         | PEND    |
+| `normalize()` implementation.       | Liyang QIAN | 3         | PEND    |
+| `WS/OS/CPU` choices implementation. | Hao BAI     | DONE      | DONE    |
+| `sin()` for positional encoding.    | Liyang QIAN | 3         | DONE    |
+| `decoder()` part.                   | Wentao YAO  | 3         | DONE    |
+
+### Hardware (by *CHISEL*)
+
+| TODO                                    | Executer    | Day SPENT | PROCESS |
+| --------------------------------------- | ----------- | --------- | ------- |
+| `pipeline_divisor` implementation       | Wentao YAO  | 6         | START   |
+| `vector_ALU` implementation             | Hao BAI     | 3         | START   |
+| `pipeline_multiplicator` implementation | Liyang QIAN | 4         | START   |
+
+## FIXME
+
+| FIXME                         | Executer    | Day SPENT | STATUS |
+| ----------------------------- | ----------- | --------- | ------ |
+| `normalize()` implementation. | Liyang QIAN | 3         | PEND   |
+|                               |             |           |        |
 
 ## Our Working Time
 
