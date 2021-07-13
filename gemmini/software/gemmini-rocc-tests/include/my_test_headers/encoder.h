@@ -15,6 +15,8 @@
 
 void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t accel_type)
 {
+  uint64_t cycle[50] = {0};
+  int length = 0;
   uint64_t start, end;
   printf("\n");
 
@@ -30,7 +32,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   static elem_t word_vector[wordNum][wordDim];
   static elem_t positions[wordNum][wordDim];
   static elem_t id_word[wordDim][wordDim];
-  
+
   for (size_t i = 0; i < wordDim; i++)
   {
     for (size_t j = 0; j < wordDim; j++)
@@ -40,7 +42,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   }
   // positional embedding
   start = read_cycles();
-  positional_embedding(wordNum, wordDim, positions);
+  loading_Positional_embedding(wordNum, wordDim, positions);
   tiled_matmul_auto(wordNum, wordDim, wordDim,
                     (elem_t *)word_vector0, (elem_t *)id_word, (elem_t *)positions, (elem_t *)word_vector,
                     wordDim, wordDim, wordDim, wordDim,
@@ -51,6 +53,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                     3,
                     accel_type);
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for positional encoding: %d\n", end - start);
 
   // self-attention
@@ -87,6 +91,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                       accel_type);
   }
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for get Q K V matrix: %d\n", end - start);
 
   // Q*K^T
@@ -105,6 +111,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                       accel_type);
   }
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for Q*K^T: %d\n", end - start);
 
   //softmax(Q*K^T),unfinished
@@ -115,6 +123,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
     softmaxFunc(wordDim, wordDim, temp_qk[count], softmaxResultMat[count]);
   }
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for softmax(Q*K^T): %d\n", end - start);
 
   //softmax(Q*K^T) * V
@@ -133,6 +143,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                       accel_type);
   }
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for softmax(Q*K^T)*V: %d\n", end - start);
 
   //concat z_vectors and multiple weight(multihead attention)
@@ -150,7 +162,10 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
     }
   }
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for concatination: %d\n", end - start);
+
   static elem_t final_z_mat[wordNum][wordDim];
   start = read_cycles();
   tiled_matmul_auto(wordNum, wordDim, n_head * weightDim,
@@ -163,6 +178,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                     3,
                     accel_type);
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for multihead attention: %d\n", end - start);
 
   // add and normalize(add part)
@@ -187,6 +204,8 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
 
   add_normalize(wordDim, wordDim, (elem_t *)final_z_mat, (elem_t *)word_vector, (elem_t *)normalized_z_mat);
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for add&normalization: %d\n", end - start);
 
   // fully connected layer1
@@ -198,18 +217,30 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
                        RELU, 0, 0, false,
                        accel_type, false, "fc_layer1");
   end = read_cycles();
+  cycle[length] = end - start;
+  length++;
   printf("Time for fc_layer: %d\n", end - start);
 
   // add & normalization after FC(add part)
   static elem_t final_encoder_output[wordDim][wordDim];
+  start = read_cycles();
   add_normalize(wordNum, wordDim, (elem_t *)fc_result1, (elem_t *)normalized_z_mat, (elem_t *)final_encoder_output);
-
+  end = read_cycles();
+  cycle[length] = end - start;
+  length++;
+  printf("Time for add & normalization: %d\n", end - start);
   // linear layer
 
   tiled_matmul_nn_auto(wordDim, wordDim, wordDim,
                        normalized_z_mat, fc_weight1, NULL, fc_result1,
                        RELU, 0, 0, false,
                        WS, false, "fc_layer1");
-
+  uint64_t OvertotalTime = 0;
+  for (int i = 0; i < length; i++)
+  {
+    OvertotalTime += cycle[i];
+  }
+  printf("total time for encoder:%llu\n",OvertotalTime);
+  printf("\n\n");
   return;
 }

@@ -5,6 +5,7 @@
         "stdlib.h": "c",
         "libc-header-start.h": "c",
         "encoder.h": "c",
-        "auxiliary.h": "c"
+        "auxiliary.h": "c",
+        "parameters4.h": "c"
     }
 }
