@@ -40,22 +40,47 @@ class pipline_div(val width:Int) extends Module
         val div = Input(SInt(width.W))
         val result = Output(SInt(width.W))
         val en = Input(Bool())
+        val valid = Output(Bool())
     })
     val alu_array = Seq.fill(width+1)(Module(new div_pe(width)))
+
+    val remainders = Seq.fill(width)(RegInit(0.S))
+    val divs = Seq.fill(width)(RegInit(0.S))
+    val bits = Seq.fill(width)(Reg(SInt(width.W)))
+    val valids = Seq.fill(width)(RegInit(0.B))
+
     alu_array(0).io.remainder_in:=io.dividend
     alu_array(0).io.div_in:=io.div<<width
     alu_array(0).io.in_bit:=0.S 
     alu_array(0).io.in_valid:=io.en
     for(i<-0 until width)
     {
-        alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
-        alu_array(i+1).io.div_in:=alu_array(i).io.div_out
-        alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
-        alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
-    }
-    io.result:=alu_array(width).io.out_bit
-    printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
+        remainders(i):=alu_array(i).io.remainder_out
+        divs(i):=alu_array(i).io.div_out
+        bits(i):=alu_array(i).io.out_bit
+        valids(i):=alu_array(i).io.out_valid
 
-    // printf("%d %d %d %d %d %d %d %d %d\n",alu_array(0).io.out_bit,alu_array(1).io.out_bit,alu_array(2).io.out_bit,alu_array(3).io.out_bit,alu_array(4).io.out_bit,alu_array(5).io.out_bit,alu_array(6).io.out_bit,alu_array(7).io.out_bit,alu_array(8).io.out_bit)
+        alu_array(i+1).io.remainder_in:= remainders(i)
+        alu_array(i+1).io.div_in:= divs(i)
+        alu_array(i+1).io.in_bit:= bits(i)
+        alu_array(i+1).io.in_valid:=valids(i)
+
+        // alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
+        // alu_array(i+1).io.div_in:=alu_array(i).io.div_out
+        // alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
+        // alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
+    }
+
+    io.result:=alu_array(width).io.out_bit
+    io.valid:=alu_array(width).io.out_valid
+    // printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
+
+    // for(i<-0 until width+1)
+    // {
+    //     printf("%d ",alu_array(i).io.out_bit)
+    // }
+    // printf("%d ",io.result)
+    // printf("\n")
+
 
 }

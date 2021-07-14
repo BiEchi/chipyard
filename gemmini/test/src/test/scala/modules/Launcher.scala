@@ -21,7 +21,12 @@ object Launcher {
       Driver.execute(() => new pipline_div(8), manager) {
         (c) => new pipline_div_test(c)
       }
-    }
+    },
+    "vec_alu" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new vec_alu(16,6), manager) {
+        (c) => new vec_alu_test(c)
+      }
+    }  
   )
 
   def main(args: Array[String]): Unit = {
