@@ -18,7 +18,7 @@ object Launcher {
       }
     },
     "pipline_div" -> { (manager: TesterOptionsManager) =>
-      Driver.execute(() => new pipline_div(8,8), manager) {
+      Driver.execute(() => new pipline_div(8), manager) {
         (c) => new pipline_div_test(c)
       }
     }

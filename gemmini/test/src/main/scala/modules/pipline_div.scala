@@ -33,7 +33,7 @@ class div_pe(val width:Int) extends Module
     io.out_valid:=io.in_valid
 }
 
-class pipline_div(val width:Int,val num:Int) extends Module
+class pipline_div(val width:Int) extends Module
 {
     val io = IO(new Bundle{
         val dividend = Input(SInt(width.W))
@@ -41,19 +41,19 @@ class pipline_div(val width:Int,val num:Int) extends Module
         val result = Output(SInt(width.W))
         val en = Input(Bool())
     })
-    val alu_array = Seq.fill(num+1)(Module(new div_pe(width)))
+    val alu_array = Seq.fill(width+1)(Module(new div_pe(width)))
     alu_array(0).io.remainder_in:=io.dividend
     alu_array(0).io.div_in:=io.div<<width
     alu_array(0).io.in_bit:=0.S 
     alu_array(0).io.in_valid:=io.en
-    for(i<-0 until num)
+    for(i<-0 until width)
     {
         alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
         alu_array(i+1).io.div_in:=alu_array(i).io.div_out
         alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
         alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
     }
-    io.result:=alu_array(num).io.out_bit
+    io.result:=alu_array(width).io.out_bit
     printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
 
     // printf("%d %d %d %d %d %d %d %d %d\n",alu_array(0).io.out_bit,alu_array(1).io.out_bit,alu_array(2).io.out_bit,alu_array(3).io.out_bit,alu_array(4).io.out_bit,alu_array(5).io.out_bit,alu_array(6).io.out_bit,alu_array(7).io.out_bit,alu_array(8).io.out_bit)
