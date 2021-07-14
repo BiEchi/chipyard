@@ -11,6 +11,11 @@ object Launcher {
       Driver.execute(() => new shift_mul(), manager) {
         (c) => new shift_mul_test(c)
       }
+    },
+    "shift_div" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new shift_div(8), manager) {
+        (c) => new shift_div_test(c)
+      }
     }
   )
 
