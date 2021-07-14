@@ -39,6 +39,9 @@ docker run -it --name=chipyard-transformer \
 ### Verliog Learing Web
 https://hdlbits.01xz.net/wiki/Main_Page
 
+### Chisel Textbook:
+search chisel-book in github
+
 ## FIXME
 
 | FIXME                         | Executer    | Day SPENT | STATUS |
