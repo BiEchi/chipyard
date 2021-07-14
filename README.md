@@ -11,8 +11,8 @@ This is a test repo for chipyard greenhands.
 https://github.com/BiEchi/chipyard
 
 ```shell
-docker run -it --name=chipyard-transformer \
---mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer
+docker run -it --name=chipyard-transformer-software \
+--mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer:software
 ```
 
 ## TODO
