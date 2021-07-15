@@ -16,7 +16,22 @@ object Launcher {
       Driver.execute(() => new shift_div(8), manager) {
         (c) => new shift_div_test(c)
       }
-    }
+    },
+    "chiselPra_qly" -> { (manager: TesterOptionsManager) => 
+      Driver.execute(()=>new DeviceUnderTest(), manager) {
+        (c) => new TesterSimple(c)
+      }
+    },
+    "pipline_mul_4bit" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new pipline_mul_4bit(), manager) {
+        (c) => new pipline_mul_4bit_tester(c)
+      }
+    },
+    "pipline_mul" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new pipline_mul(4), manager) {
+        (c) => new pipline_mul_tester(c)
+      }
+    },
   )
 
   def main(args: Array[String]): Unit = {

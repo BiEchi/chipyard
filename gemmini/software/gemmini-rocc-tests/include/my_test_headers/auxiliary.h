@@ -284,6 +284,7 @@ void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t so
       MatQK[rowId][columnId] = exp_cal(10, MatQK[rowId][columnId] / CarmSqrt(weightDim));
     }
   }
+  
   row_summary(column, (elem_t *)MatQK, (elem_t *)rowSum, (elem_t *)allOne_vector);
   for (int i = 0; i < column; i++)
   {

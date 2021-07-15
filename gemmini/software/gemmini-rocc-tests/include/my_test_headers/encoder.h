@@ -19,6 +19,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   int length = 0;
   uint64_t start, end;
   printf("\n");
+  static elem_t word_vector[wordNum][wordDim];
 
   //my multihead
   static elem_t q_mats[n_head][wordDim][weightDim];
@@ -29,7 +30,6 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   static elem_t z_vs[n_head][wordNum][weightDim];
   /*====================Transformer Encoder======================*/
 
-  static elem_t word_vector[wordNum][wordDim];
   static elem_t positions[wordNum][wordDim];
   static elem_t id_word[wordDim][wordDim];
 
