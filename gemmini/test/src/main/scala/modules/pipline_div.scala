@@ -48,11 +48,38 @@ class pipline_div(val width:Int) extends Module
     val divs = Seq.fill(width)(RegInit(0.S))
     val bits = Seq.fill(width)(Reg(SInt(width.W)))
     val valids = Seq.fill(width)(RegInit(0.B))
+    val sign = Seq.fill(width)(Reg(UInt(1.W)))
+// temporary
+    val judge_a = Wire(UInt(1.W))
+    val judge_b = Wire(UInt(1.W))
+    judge_a:=io.dividend(width-1)
+    judge_b:=io.div(width-1)
 
-    alu_array(0).io.remainder_in:=io.dividend
-    alu_array(0).io.div_in:=io.div<<width
+    //judge the sign of input
+    when(judge_a===1.U)
+    {
+        alu_array(0).io.remainder_in:= (~(io.dividend-1.S))
+    }
+    .otherwise
+    {
+        alu_array(0).io.remainder_in:=io.dividend
+    }
+
+    when(judge_b===1.U)
+    {
+        alu_array(0).io.div_in:=(~(io.div-1.S))<<width
+    }
+    .otherwise
+    {
+        alu_array(0).io.div_in:= io.div<<width
+    }
+
+    // alu_array(0).io.remainder_in:=io.dividend
+    // alu_array(0).io.div_in:=io.div<<width
     alu_array(0).io.in_bit:=0.S 
     alu_array(0).io.in_valid:=io.en
+    sign(0):=judge_a ^ judge_b
+
     for(i<-0 until width)
     {
         remainders(i):=alu_array(i).io.remainder_out
@@ -64,14 +91,27 @@ class pipline_div(val width:Int) extends Module
         alu_array(i+1).io.div_in:= divs(i)
         alu_array(i+1).io.in_bit:= bits(i)
         alu_array(i+1).io.in_valid:=valids(i)
-
         // alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
         // alu_array(i+1).io.div_in:=alu_array(i).io.div_out
         // alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
         // alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
     }
 
-    io.result:=alu_array(width).io.out_bit
+    for(i<-0 until width-1)
+    {
+        sign(i+1):=sign(i)
+    }
+     
+    //judge the sign of the result
+    when(sign(width-1)===1.U)
+    {
+        io.result:= (~alu_array(width).io.out_bit)+1.S
+    }
+    .otherwise
+    {
+        io.result:=alu_array(width).io.out_bit
+    }
+    // io.result:=alu_array(width).io.out_bit
     io.valid:=alu_array(width).io.out_valid
     // printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
 
@@ -79,7 +119,7 @@ class pipline_div(val width:Int) extends Module
     // {
     //     printf("%d ",alu_array(i).io.out_bit)
     // }
-    // printf("%d ",io.result)
+    // printf("%d\n",io.result)
     // printf("\n")
 
 

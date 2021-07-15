@@ -22,9 +22,9 @@ object Launcher {
         (c) => new pipline_div_test(c)
       }
     },
-    "vec_alu" -> { (manager: TesterOptionsManager) =>
-      Driver.execute(() => new vec_alu(16,6), manager) {
-        (c) => new vec_alu_test(c)
+    "adder_tree" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new adder_array(8,16), manager) {
+        (c) => new adder_tree_test(c)
       }
     }  
   )
