@@ -2,11 +2,13 @@
 
 This is a test repo for chipyard greenhands.
 
-## pull the docker images
+## Environment Construction
+
+### pull the docker images
 
 `docker pull chipyard/chipyard_transformer`
 
-## mount the git gemmini with docker container
+### mount the git gemmini with docker container
 
 https://github.com/BiEchi/chipyard
 
@@ -15,9 +17,35 @@ docker run -it --name=chipyard-transformer-software \
 --mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer:software
 ```
 
-## TODO
+### Test Functionality
 
-### Software (by *C*)
+```shell
+#!/bin/bash
+# You're now at ~/chipyard/generators/gemmini/test
+sbt "test:runMain modules.Launcher chiselPra_qly" # or other submodule you want to build
+```
+
+---
+
+## Learning Resources
+
+### CHISEL Learning Resources
+
+[CSE 293 Agile Hardware Design](https://classes.soe.ucsc.edu/cse293/Spring21/references/chisel/)
+
+[Jupyter Notebook Script](https://github.com/agile-hw/lectures)
+
+### Verliog Learing Web
+
+https://hdlbits.01xz.net/wiki/Main_Page
+
+---
+
+## Project Process
+
+### TODO
+
+#### Software (by *C*)
 
 | TODO                                | Executer    | Day SPENT | PROCESS |
 | ----------------------------------- | ----------- | --------- | ------- |
@@ -28,7 +56,7 @@ docker run -it --name=chipyard-transformer-software \
 | `sin()` for positional encoding.    | Liyang QIAN | 3         | DONE    |
 | `decoder()` part.                   | Wentao YAO  | 3         | DONE    |
 
-### Hardware (by *CHISEL*)
+#### Hardware (by *CHISEL*)
 
 | TODO                                    | Executer    | Day SPENT | PROCESS |
 | --------------------------------------- | ----------- | --------- | ------- |
@@ -36,26 +64,22 @@ docker run -it --name=chipyard-transformer-software \
 | `vector_ALU` implementation             | Hao BAI     | 3         | START   |
 | `pipeline_multiplicator` implementation | Liyang QIAN | 4         | START   |
 
-### Verliog Learing Web
-https://hdlbits.01xz.net/wiki/Main_Page
-
-### Chisel Textbook:
-search chisel-book in github
-
-## FIXME
+### FIXME
 
 | FIXME                         | Executer    | Day SPENT | STATUS |
 | ----------------------------- | ----------- | --------- | ------ |
 | `normalize()` implementation. | Liyang QIAN | 3         | PEND   |
 |                               |             |           |        |
 
-## Our Working Time
+### Our Working Time
 
 | Time          | Name        |
 | ------------- | ----------- |
 | 9-7-6         | Liyang QIAN |
 | 10-7-6        | Wentao YAO  |
 | 9-5-6 / 9-9-5 | Hao BAI     |
+
+---
 
 ## Working References
 
