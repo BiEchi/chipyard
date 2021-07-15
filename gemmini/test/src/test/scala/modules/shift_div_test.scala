@@ -9,4 +9,6 @@ class shift_div_test(c: shift_div) extends PeekPokeTester(c) {
     step(1)
     poke(c.io.load,false)
     step(15)
+
+    
 }

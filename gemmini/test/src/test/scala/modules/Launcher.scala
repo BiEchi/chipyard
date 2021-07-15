@@ -5,6 +5,7 @@ import chisel3._
 import chisel3.iotesters.{Driver, TesterOptionsManager}
 import utils.TutorialRunner
 
+// run sbt "test:runMain modules.Launcher xxx"
 object Launcher {
   val tests = Map(
     "shift_mul" -> { (manager: TesterOptionsManager) =>
@@ -32,6 +33,11 @@ object Launcher {
         (c) => new pipline_mul_tester(c)
       }
     },
+    "pipline_div" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new pipline_div(8), manager) {
+        (c) => new pipline_div_test(c)
+      }
+    }
   )
 
   def main(args: Array[String]): Unit = {
