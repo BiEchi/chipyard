@@ -40,22 +40,87 @@ class pipline_div(val width:Int) extends Module
         val div = Input(SInt(width.W))
         val result = Output(SInt(width.W))
         val en = Input(Bool())
+        val valid = Output(Bool())
     })
     val alu_array = Seq.fill(width+1)(Module(new div_pe(width)))
-    alu_array(0).io.remainder_in:=io.dividend
-    alu_array(0).io.div_in:=io.div<<width
+
+    val remainders = Seq.fill(width)(RegInit(0.S))
+    val divs = Seq.fill(width)(RegInit(0.S))
+    val bits = Seq.fill(width)(Reg(SInt(width.W)))
+    val valids = Seq.fill(width)(RegInit(0.B))
+    val sign = Seq.fill(width)(Reg(UInt(1.W)))
+// temporary
+    val judge_a = Wire(UInt(1.W))
+    val judge_b = Wire(UInt(1.W))
+    judge_a:=io.dividend(width-1)
+    judge_b:=io.div(width-1)
+
+    //judge the sign of input
+    when(judge_a===1.U)
+    {
+        alu_array(0).io.remainder_in:= (~(io.dividend-1.S))
+    }
+    .otherwise
+    {
+        alu_array(0).io.remainder_in:=io.dividend
+    }
+
+    when(judge_b===1.U)
+    {
+        alu_array(0).io.div_in:=(~(io.div-1.S))<<width
+    }
+    .otherwise
+    {
+        alu_array(0).io.div_in:= io.div<<width
+    }
+
+    // alu_array(0).io.remainder_in:=io.dividend
+    // alu_array(0).io.div_in:=io.div<<width
     alu_array(0).io.in_bit:=0.S 
     alu_array(0).io.in_valid:=io.en
+    sign(0):=judge_a ^ judge_b
+
     for(i<-0 until width)
     {
-        alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
-        alu_array(i+1).io.div_in:=alu_array(i).io.div_out
-        alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
-        alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
-    }
-    io.result:=alu_array(width).io.out_bit
-    printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
+        remainders(i):=alu_array(i).io.remainder_out
+        divs(i):=alu_array(i).io.div_out
+        bits(i):=alu_array(i).io.out_bit
+        valids(i):=alu_array(i).io.out_valid
 
-    // printf("%d %d %d %d %d %d %d %d %d\n",alu_array(0).io.out_bit,alu_array(1).io.out_bit,alu_array(2).io.out_bit,alu_array(3).io.out_bit,alu_array(4).io.out_bit,alu_array(5).io.out_bit,alu_array(6).io.out_bit,alu_array(7).io.out_bit,alu_array(8).io.out_bit)
+        alu_array(i+1).io.remainder_in:= remainders(i)
+        alu_array(i+1).io.div_in:= divs(i)
+        alu_array(i+1).io.in_bit:= bits(i)
+        alu_array(i+1).io.in_valid:=valids(i)
+        // alu_array(i+1).io.remainder_in:=alu_array(i).io.remainder_out
+        // alu_array(i+1).io.div_in:=alu_array(i).io.div_out
+        // alu_array(i+1).io.in_bit:=alu_array(i).io.out_bit
+        // alu_array(i+1).io.in_valid:=alu_array(i).io.out_valid
+    }
+
+    for(i<-0 until width-1)
+    {
+        sign(i+1):=sign(i)
+    }
+     
+    //judge the sign of the result
+    when(sign(width-1)===1.U)
+    {
+        io.result:= (~alu_array(width).io.out_bit)+1.S
+    }
+    .otherwise
+    {
+        io.result:=alu_array(width).io.out_bit
+    }
+    // io.result:=alu_array(width).io.out_bit
+    io.valid:=alu_array(width).io.out_valid
+    // printf("\nThe result of %d/%d is:%d\n\n",io.dividend,io.div,io.result)
+
+    // for(i<-0 until width+1)
+    // {
+    //     printf("%d ",alu_array(i).io.out_bit)
+    // }
+    // printf("%d\n",io.result)
+    // printf("\n")
+
 
 }

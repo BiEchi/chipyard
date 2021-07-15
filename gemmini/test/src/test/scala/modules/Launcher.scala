@@ -37,7 +37,12 @@ object Launcher {
       Driver.execute(() => new pipline_div(8), manager) {
         (c) => new pipline_div_test(c)
       }
-    }
+    },
+    "adder_tree" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new adder_array(8,16), manager) {
+        (c) => new adder_tree_test(c)
+      }
+    }  
   )
 
   def main(args: Array[String]): Unit = {
