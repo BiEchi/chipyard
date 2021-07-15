@@ -42,7 +42,12 @@ object Launcher {
       Driver.execute(() => new adder_array(8,16), manager) {
         (c) => new adder_tree_test(c)
       }
-    }  
+    },
+    "vector_ALU" -> { (manager: TesterOptionsManager) =>
+      Driver.execute(() => new vector_ALU(4), manager) {
+        (c) => new vector_ALU_test(c)
+      }
+    }
   )
 
   def main(args: Array[String]): Unit = {
