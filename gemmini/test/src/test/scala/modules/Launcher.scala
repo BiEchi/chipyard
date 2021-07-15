@@ -29,7 +29,7 @@ object Launcher {
       }
     },
     "pipline_mul" -> { (manager: TesterOptionsManager) =>
-      Driver.execute(() => new pipline_mul(4), manager) {
+      Driver.execute(() => new pipline_mul(8), manager) {
         (c) => new pipline_mul_tester(c)
       }
     },
