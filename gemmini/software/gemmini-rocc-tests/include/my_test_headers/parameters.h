@@ -3,15 +3,18 @@
 #include <stdio.h>
 
 // #define DIM_I 64
-#define wordNum 4
+#define wordNum 64
 
-// #define DIM_J 32
-#define weightDim 5
+// #define DIM_J 512
+#define weightDim 512
 
-// #define DIM_K 128
-#define wordDim 6
+// #define DIM_K 512
+#define wordDim 512
 
-#define n_head 4
+// 
+#define n_head 8
+
+// 512
 #define n_words 512
 
 // aux matrix

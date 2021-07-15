@@ -107,50 +107,54 @@ float my_sqrt(float number)
   float temp, sqrt;
   sqrt = number / 2;
   temp = 0;
-  while(sqrt != temp){
+  while (sqrt != temp)
+  {
     temp = sqrt;
-    sqrt = ( number/temp + temp) / 2;
+    sqrt = (number / temp + temp) / 2;
   }
   return sqrt;
 }
 
-void layer_normalization(size_t dim_i, size_t dim_j, elem_t* added_mat)
+void layer_normalization(size_t dim_i, size_t dim_j, elem_t *added_mat)
 {
   long alpha, beta, epsilon;
-
+  // printf("hello world\n");
   /***** SUPER-PERIMETERS *****/
   alpha = 1;
   beta = 0;
   epsilon = 0.05;
-
+  // printf("breakpoint 0");
   elem_t mean_value[dim_i];
   elem_t square_deviation[dim_i];
+  // printf("breakpoint 1");
   for (size_t i = 0; i < dim_i; i++)
   {
     size_t sum = 0;
     for (size_t j = 0; j < dim_j; j++)
     {
-      sum += added_mat[dim_i*i + j];
+      sum += added_mat[dim_i * i + j];
     }
     mean_value[i] = sum / dim_j;
   }
+  // printf("breakpoint 2");
 
   for (size_t i = 0; i < dim_i; i++)
   {
     for (size_t j = 0; j < dim_j; j++)
     {
-      square_deviation[i] += (added_mat[dim_i*i + j] - mean_value[i]) * (added_mat[dim_i*i + j] - mean_value[i]);
+      square_deviation[i] += (added_mat[dim_i * i + j] - mean_value[i]) * (added_mat[dim_i * i + j] - mean_value[i]);
     }
   }
+  // printf("breakpoint 3");
 
   for (size_t i = 0; i < dim_i; i++)
   {
     for (size_t j = 0; j < dim_j; j++)
     {
-      added_mat[dim_i*i + j] = alpha * (added_mat[dim_i*i + j] - mean_value[i]) / (my_sqrt(square_deviation[i] + epsilon)) + beta;
+      added_mat[dim_i * i + j] = alpha * (added_mat[dim_i * i + j] - mean_value[i]) / (my_sqrt(square_deviation[i] + epsilon)) + beta;
     }
   }
-  
+
   return;
 }
 
@@ -168,8 +172,6 @@ double sinfunc(double x)
   }
   return sum;
 }
-
-
 
 double cosfunc(double x)
 {
@@ -207,19 +209,18 @@ float CarmSqrt(float x)
   return 0.5f * (convertor.floatPart + (x * convertor2.floatPart));
 }
 
-// 对原来的字矩阵直接进行position embedding，不保留原数据
-void positional_embedding(size_t length, size_t dimension, elem_t positional_mat[length][dimension])
+// loading the embedding function
+void loading_Positional_embedding(size_t length, size_t dimension, elem_t position_mat[length][dimension])
 {
-  // printf("positional_embedding\n");
-  // 生成位置矩阵
+  // printf("loading the positional_embedding");
   if (dimension % 2 == 0)
   {
     for (int pos = 0; pos < length; pos++)
     {
-      for (int i = 0; i < dimension; i += 2)
+      for (int dim = 0; dim < dimension; dim += 2)
       {
-        positional_mat[pos][i] = sinfunc(pos / power(10000, 2 * i / dimension));
-        positional_mat[pos][i + 1] = cosfunc(pos / power(10000, (2 * i + 1) / dimension));
+        position_mat[pos][dim] = sinfunc(pos / power(10000, 2 * dim / dimension));
+        position_mat[pos][dim + 1] = cosfunc(pos / power(10000, (2 * dim + 1) / dimension));
       }
     }
   }
@@ -227,71 +228,83 @@ void positional_embedding(size_t length, size_t dimension, elem_t positional_mat
   {
     for (int pos = 0; pos < length; pos++)
     {
-      for (int i = 0; i < dimension - 1; i += 2)
+      for (int dim = 0; dim < dimension - 1; dim += 2)
       {
-        positional_mat[pos][i] = sinfunc(pos / power(10000, 2 * i / dimension));
-        positional_mat[pos][i + 1] = cosfunc(pos / power(10000, (2 * i + 1) / dimension));
+        position_mat[pos][dim] = sinfunc(pos / power(10000, 2 * dim / dimension));
+        position_mat[pos][dim + 1] = cosfunc(pos / power(10000, (2 * dim + 1) / dimension));
       }
-      positional_mat[pos][dimension - 1] = sinfunc(pos / power(10000, 2 * (dimension - 1) / dimension));
+      position_mat[pos][dimension - 1] = sinfunc(pos / power(10000, 2 * (dimension - 1) / dimension));
     }
   }
   return;
 }
 
-void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_vector)
-{
-  for (int i = 0; i < column; i++)
-  {
-    result += *(matrixRow + i);
-  }
-  return;
-}
-
-// Cannot store the value into mat
-// void row_summary(int column, elem_t *matrixRow, elem_t* result, elem_t *allOne_vector)
+// void row_summary(int column, elem_t *matrixRow, elem_t result, elem_t *allOne_vector)
 // {
-//   printf("row sum\n");
-//   tiled_matmul_auto(1, 1, column,
-//                     matrixRow, allOne_vector,
-//                     NULL, result,
-//                     column, 1, 1, 1,
-//                     MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-//                     NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-//                     false, true,
-//                     false, false,
-//                     3,
-//                     WS);
+//   for (int i = 0; i < column; i++)
+//   {
+//     result += *(matrixRow + i);
+//   }
 //   return;
 // }
 
+// Cannot store the value into mat
+void row_summary(int column, elem_t *InputMat, elem_t *result, elem_t *allOne_vector)
+{
+  // printf("row sum\n");
+  tiled_matmul_auto(column, 1, column,
+                    InputMat, allOne_vector,
+                    NULL, result,
+                    column, 1, 1, 1,
+                    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+                    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+                    false, false,
+                    false, false,
+                    3,
+                    WS);
+  return;
+}
+
 // generate the softmax result
-void softmaxFunc(size_t row, size_t column, elem_t objectMat[row][column], elem_t softmaxResultMat[row][column])
+void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t softmaxResultMat[row][column])
 {
   // printf("softmax function\n");
-  elem_t allOne_vector[column];
+  elem_t allOne_vector[column][1];
+  elem_t rowSum[column][1];
+  elem_t idMat[column][column];
   for (int i = 0; i < column; i++)
   {
-    allOne_vector[i] = 1;
+    allOne_vector[i][0] = 1;
   }
-
   // change the value into exp weight
   for (int rowId = 0; rowId < row; rowId++)
   {
     for (int columnId = 0; columnId < column; columnId++)
     {
-      objectMat[rowId][columnId] = exp_cal(10, objectMat[rowId][columnId] / CarmSqrt(weightDim));
+      MatQK[rowId][columnId] = exp_cal(10, MatQK[rowId][columnId] / CarmSqrt(weightDim));
     }
   }
-
-  for (int rowId = 0; rowId < row; rowId++)
+  
+  row_summary(column, (elem_t *)MatQK, (elem_t *)rowSum, (elem_t *)allOne_vector);
+  for (int i = 0; i < column; i++)
   {
-    elem_t row_sum;
-    row_summary(column, objectMat[rowId], row_sum, allOne_vector);
-    for (int columnId = 0; columnId < column; columnId++)
+    for (int j = 0; j < column; j++)
     {
-      softmaxResultMat[rowId][columnId] = objectMat[rowId][columnId] / row_sum;
+      if (i == j)
+        idMat[i][j] = 1 / rowSum[i][0];
+      else
+        idMat[i][j] = 0;
     }
   }
+  tiled_matmul_auto(column, column, column,
+                    (elem_t *)MatQK, (elem_t *)idMat, NULL, (elem_t *)softmaxResultMat,
+                    column, column, column, column,
+                    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+                    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+                    false, false,
+                    false, false,
+                    3,
+                    WS);
   return;
 }
 
@@ -302,7 +315,6 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
     for (size_t j = 0; j < dim_j; j++)
       id_mat[i][j] = (i == j);
   u_int64_t start, end;
-  start = read_cycles();
   tiled_matmul_auto(dim_i, dim_j, dim_j,
                     (elem_t *)mat_a, (elem_t *)id_mat, (elem_t *)mat_b, (elem_t *)added_mat,
                     dim_j, dim_j, dim_j, dim_j,
@@ -312,8 +324,6 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
                     false, true,
                     3,
                     WS);
-  end = read_cycles();
-  printf("Time for add & normalization: %d\n", end - start);
 }
 
 #endif /* AUX_H */
