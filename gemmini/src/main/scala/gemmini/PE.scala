@@ -14,7 +14,7 @@ class PEControl[T <: Data : Arithmetic](accType: T) extends Bundle {
 
 // TODO update documentation
 /**
-  * A PE implementing a MAC operation. Configured as fully combinational when integrated into a Mesh.
+  * A PE implementing a MAC operation (multi-accumulate operation). Configured as fully combinational when integrated into a Mesh.
   * @param width Data width of operands
   */
 class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value, latency: Int, max_simultaneous_matmuls: Int)
@@ -22,11 +22,15 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
   import ev._
 
   val io = IO(new Bundle {
+    // in_a: the matrix row number
     val in_a = Input(inputType)
+    // in_b : another input
     val in_b = Input(outputType)
+    // preload matrix d
     val in_d = Input(outputType)
     val out_a = Output(inputType)
     val out_b = Output(outputType)
+    // out_c will be connected to in_d
     val out_c = Output(outputType)
 
     val in_control = Input(new PEControl(accType))
@@ -46,9 +50,10 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
 
   val cType = if (df == Dataflow.WS) inputType else accType
 
-  val a  = ShiftRegister(io.in_a, latency)
-  val b  = ShiftRegister(io.in_b, latency)
+  val a  = ShiftRegister(io.in_a, latency) //a: input
+  val b  = ShiftRegister(io.in_b, latency) //b: input
   val d  = ShiftRegister(io.in_d, latency)
+  // c1,c2: preload
   val c1 = Reg(cType)
   val c2 = Reg(cType)
   val dataflow = ShiftRegister(io.in_control.dataflow, latency)
@@ -58,6 +63,7 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
   val last = ShiftRegister(io.in_last, latency)
   val valid = ShiftRegister(io.in_valid, latency) // TODO should we clockgate the rest of the ShiftRegisters based on the values in this ShiftRegisters
 
+  // forwarding a
   io.out_a := a
   io.out_control.dataflow := dataflow
   io.out_control.propagate := prop
@@ -82,6 +88,7 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
   when ((df == Dataflow.OS).B || ((df == Dataflow.BOTH).B && dataflow === OUTPUT_STATIONARY)) {
     when(prop === PROPAGATE) {
       io.out_c := (c1 >> shift_offset).clippedToWidthOf(outputType)
+      // forwarding b
       io.out_b := b
       c2 := c2.mac(a, b.asTypeOf(inputType))
       c1 := d.withWidthOf(cType)
@@ -94,6 +101,7 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
   }.elsewhen ((df == Dataflow.WS).B || ((df == Dataflow.BOTH).B && dataflow === WEIGHT_STATIONARY)) {
     when(prop === PROPAGATE) {
       io.out_c := c1
+      // mac is a multiplication-add module, guess: b.mac(a,c) -> b = b + a*c
       io.out_b := b.mac(a, c2.asTypeOf(inputType))
       c1 := d
     }.otherwise {
