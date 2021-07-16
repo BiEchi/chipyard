@@ -41,5 +41,5 @@ doc/*.aux
 doc/*.log
 
 # ignore for practice
-src/main/modules *_qly.scala
-src/test/modules *_qly_test.scala
+src/main/scala/modules *_qly.scala
+src/test/scala/modules *_qly_test.scala
