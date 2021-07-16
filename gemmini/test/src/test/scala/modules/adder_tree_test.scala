@@ -9,5 +9,4 @@ class adder_tree_test(c: adder_array) extends PeekPokeTester(c) {
     }
     step(6)
     println("ans: "+peek(c.io.out).toString)
-
 }
