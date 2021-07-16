@@ -5,6 +5,8 @@ import chisel3.util._
 import chisel3.experimental._
 import scala.collection._
 
+// Attention: all of this file can become comment
+
 class DeviceUnderTest extends Module{
     val io = IO(new Bundle {
         val a = Input(UInt(2.W))
@@ -137,10 +139,70 @@ class ResultCircuit extends Module{
     val fetch = Module(new Fetch)
     val decode = Module(new Decode)
     val execute = Module(new Execute)
+    // these modules are connected in series
     fetch.io <> decode.io
     decode.io <> execute.io 
     io<>execute.io
 }
 
+
+class chapt7 extends Module{
+    io = IO(new Bundle{
+        val input = Input(UInt(2.W))
+    })
+    val cond = io.input
+    val w = WireDefault(0.U)
+    // when{}.elsewhen{}.otherwise{} -> form a series of mux in line
+    when(cond){
+        w:=3.U
+    }
+}
+
+class chapt8 extends Module{
+    io = IO(new Bundle{
+        val N = input(UInt(8.W))
+    })
+    val q = RegNext(d)
+    // RegNext always has one cycle delay(output the state in precedent cycle)
+    val enableReg = RegInit(0.U(4.W))
+    when(enable){
+        enableReg := inVal
+    }
+    // detecting the posedge
+    val risingEdge = din &! RegNext(din)
+    // val risingEdge = din &! Reg(din)
+
+    // counter
+    val cntReg = RegInit(0.U(8.W))
+    cntReg:= cntReg + 1.U
+    when(cntReg === io.N){
+        cntReg := 0.U
+    }
+    // which is equal to 
+    cntReg := Mux(cntReg === io.N, 0.U, cntReg + 1.U)
+    // counting down
+    cntReg := Mux(cntReg === 0, io.N, cntReg - 1.U)
+
+    // generating a counter
+    def genCounter(n:Int) = {
+        val cntReg = RegInit(0.U(8.W))
+        cntReg := Mux(cntReg === n.U, 0.U, cntReg + 1.U)
+        cntReg
+    }
+
+    // Specific timing circuit
+    val tickCounterReg = RegInit(0.U(4.W))
+    val tick = tickCounterReg === (N-1).U
+    tickCounterReg := tickCounterReg+1.U
+    val lowFrequCntReg = RegInit(0.U(4.W))
+    // trigger the accident by a fixed frequency, a slow logic
+    when(tick){
+        tickCounterReg := 0.U 
+        lowFrequCntReg := lowFrequCntReg + 1.U 
+    }
+    // make some optimizion to the counter
+    // from (N-2) to -1, then we need only the most significant bit to decide whether the counter needed to be reseted
+    // decreasing the cotenent of 
+}
 
 

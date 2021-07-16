@@ -36,7 +36,6 @@ class pipline_mul(val bitwidth: Int) extends Module{
     for(i <- 0 until bitwidth){
         when(io.input_multiplier(i)){
             adder_tree.io.inputReg(i) := io.input_multiplicand << i
-            printf("the value is %d\n",adder_tree.io.inputReg(i)) 
         }.otherwise{
             adder_tree.io.inputReg(i) := 0.S(bitwidth.W)
         }
