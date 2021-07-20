@@ -39,3 +39,7 @@ doc/tutorial/*.sty
 doc/chisel-tutorial.pdf
 doc/*.aux
 doc/*.log
+
+# ignore for practice
+src/main/scala/modules *_qly.scala
+src/test/scala/modules *_qly_test.scala
