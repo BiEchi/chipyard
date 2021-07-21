@@ -16,6 +16,7 @@ class Tile[T <: Data : Arithmetic](inputType: T, outputType: T, accType: T, df: 
   val io = IO(new Bundle {
     val in_a        = Input(Vec(rows, inputType))
     val in_b        = Input(Vec(columns, outputType)) // This is the output of the tile next to it
+    // d is the preload
     val in_d        = Input(Vec(columns, outputType))
 
     val in_control  = Input(Vec(columns, new PEControl(accType)))
@@ -42,6 +43,7 @@ class Tile[T <: Data : Arithmetic](inputType: T, outputType: T, accType: T, df: 
   // TODO: abstract hori/vert broadcast, all these connections look the same
   // Broadcast 'a' horizontally across the Tile
   for (r <- 0 until rows) {
+    // scala foldleft, connect one line in a sequence and set the input as row element(on vertical direction)
     tile(r).foldLeft(io.in_a(r)) {
       case (in_a, pe) =>
         pe.io.in_a := in_a
@@ -49,8 +51,9 @@ class Tile[T <: Data : Arithmetic](inputType: T, outputType: T, accType: T, df: 
     }
   }
 
-  // Broadcast 'b' vertically across the Tile
+  // Broadcast 'b' vertically across the Tile, same as above
   for (c <- 0 until columns) {
+    // it is transpose of tile
     tileT(c).foldLeft(io.in_b(c)) {
       case (in_b, pe) =>
         pe.io.in_b := in_b
@@ -115,6 +118,7 @@ class Tile[T <: Data : Arithmetic](inputType: T, outputType: T, accType: T, df: 
   io.bad_dataflow := tile.map(_.map(_.io.bad_dataflow).reduce(_||_)).reduce(_||_)
 
   // Drive the Tile's right IO
+  // right output
   for (r <- 0 until rows) {
     io.out_a(r) := tile(r)(columns-1).io.out_a
   }
