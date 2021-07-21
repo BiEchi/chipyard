@@ -101,16 +101,20 @@ long exp_cal(int n, long x)
   return partial;
 }
 
-// this code is borrowed from https://ourcodeworld.com/articles/read/884/how-to-get-the-square-root-of-a-number-without-using-the-sqrt-function-in-c
-float my_sqrt(float number)
+// use segment linear function to fit the sqrt function
+float my_sqrt(elem_t number)
 {
-  float temp, sqrt;
-  sqrt = number / 2;
-  temp = 0;
-  while (sqrt != temp)
-  {
-    temp = sqrt;
-    sqrt = (number / temp + temp) / 2;
+  float sqrt;
+  // a is the slope
+  float a[16] = {0.3549,0.1470,0.1128,0.0951,0.0838,0.0758,0.0697,0.0648,0.0609,0.0576,0.0548,0.0523,0.0502,0.0483,0.0466,0.0451};
+  // b is the inter
+  float b[16] = {0,2.8174,3.9843,4.8798,5.6347,6.2998,6.9011,7.4540,7.9687,8.4521,8.9093,9.3441,9.7596,10.1581,10.5416,10.9116};
+  float step = 7.9438;
+  for(int i = 0;i<16;i++){
+    if((step*i <= number) && (number < step*(i+1))){
+      sqrt = a[i]*number+b[i];
+      break;
+    }
   }
   return sqrt;
 }
