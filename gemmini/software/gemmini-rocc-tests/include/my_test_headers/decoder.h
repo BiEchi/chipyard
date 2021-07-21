@@ -19,6 +19,8 @@
 
 void decoder(enum tiled_matmul_type_t accel_type)
 {
+  printf("\n>>Simulation for Transformer Decoder<<\n\n");
+
   uint64_t cycle[50] = {0};
   int length = 0;
   static elem_t q_weights[n_head][wordDim][weightDim];
@@ -52,7 +54,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder positional encoding: %d\n", end - start);
+  printf("Time for positional encoding: %d\n", end - start);
 
   // get Q K V
   start = read_cycles();
@@ -89,7 +91,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder get Q K V matrix: %d\n", end - start);
+  printf("Time for get Q K V matrix: %d\n", end - start);
 
   // Q*K^T
   static elem_t temp_qk[n_head][wordNum][wordNum];
@@ -109,7 +111,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder Q*K^T: %d\n", end - start);
+  printf("Time for Q*K^T: %d\n", end - start);
 
   // masking
   static elem_t masked_qk[n_head][wordNum][wordNum];
@@ -149,7 +151,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder masking: %d\n", end - start);
+  printf("Time for masking: %d\n", end - start);
 
   //softmax(Q*K^T)
   static elem_t softmax_qk[n_head][wordNum][wordNum];
@@ -161,7 +163,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder softmax(Q*K^T): %d\n", end - start);
+  printf("Time for softmax(Q*K^T): %d\n", end - start);
 
   //softmax(Q*K^T) * V
   static elem_t z_matrix[n_head][wordNum][weightDim];
@@ -181,7 +183,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder softmax(Q*K^T)*V: %d\n", end - start);
+  printf("Time for softmax(Q*K^T)*V: %d\n", end - start);
 
   //concat z_vectors
   static elem_t multihead_weight[n_head * weightDim][wordDim];
@@ -200,7 +202,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder concatination: %d\n", end - start);
+  printf("Time for concatination: %d\n", end - start);
 
   //multihead and add&norm
   static elem_t normalized_z_mat[wordNum][wordDim];
@@ -266,7 +268,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder Q*K^T: %d\n", end - start);
+  printf("Time for Q*K^T: %d\n", end - start);
 
   //softmax(Q*K^T)
   static elem_t softmax_qk2[n_head][wordNum][wordNum];
@@ -279,7 +281,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder softmax(Q*K^T): %d\n", end - start);
+  printf("Time for softmax(Q*K^T): %d\n", end - start);
 
   //softmax(Q*K^T) * V
   static elem_t z_matrix2[n_head][wordNum][weightDim];
@@ -299,7 +301,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder softmax(Q*K^T)*V: %d\n", end - start);
+  printf("Time for softmax(Q*K^T)*V: %d\n", end - start);
 
 
   //concat z_vectors
@@ -319,7 +321,7 @@ void decoder(enum tiled_matmul_type_t accel_type)
   end = read_cycles();
   cycle[length] = end - start;
   length++;
-  printf("Time for decoder concatination: %d\n", end - start);
+  printf("Time for concatination: %d\n", end - start);
 
   // multihead and add&&norm
   static elem_t normalized_z_mat2[wordNum][wordDim];

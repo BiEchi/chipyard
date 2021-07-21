@@ -15,6 +15,8 @@
 
 void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t accel_type)
 {
+  printf("\n\n>>Simulation for Transformer Encoder<<\n");
+
   uint64_t cycle[50] = {0};
   int length = 0;
   uint64_t start, end;
@@ -42,7 +44,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   }
   // positional embedding
   start = read_cycles();
-  loading_Positional_embedding(wordNum, wordDim, positions);
+  // loading_Positional_embedding(wordNum, wordDim, positions);
   tiled_matmul_auto(wordNum, wordDim, wordDim,
                     (elem_t *)word_vector0, (elem_t *)id_word, (elem_t *)positions, (elem_t *)word_vector,
                     wordDim, wordDim, wordDim, wordDim,
@@ -147,7 +149,6 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   printf("Time for softmax(Q*K^T)*V: %d\n", end - start);
 
   //concat z_vectors and multiple weight(multihead attention)
-  static elem_t multihead_weight[n_head * weightDim][wordDim];
   static elem_t concat_z[wordNum][n_head * weightDim];
   start = read_cycles();
   for (int i = 0; i < n_head; i++)
@@ -166,10 +167,11 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   printf("Time for concatination: %d\n", end - start);
 
   // multihead + add&norm
+  static elem_t multihead_weight[n_head * weightDim][wordDim];
   static elem_t normalized_z_mat[wordNum][wordDim];
   revised_add_normalize(wordNum,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)word_vector); 
 
-  // FC + add&norm
+  // FC + add & norm
   static elem_t fc_weight1[wordDim][wordDim];
   static elem_t fc_result1[wordNum][wordDim];
   static elem_t final_encoder_output[wordDim][wordDim];
