@@ -102,17 +102,38 @@ long exp_cal(int n, long x)
 }
 
 // this code is borrowed from https://ourcodeworld.com/articles/read/884/how-to-get-the-square-root-of-a-number-without-using-the-sqrt-function-in-c
-float my_sqrt(float number)
+// float my_sqrt(float number)
+// {
+//   float temp, sqrt;
+//   sqrt = number / 2;
+//   temp = 0;
+//   while (sqrt != temp)
+//   {
+//     temp = sqrt;
+//     sqrt = (number / temp + temp) / 2;
+//   }
+//   return sqrt;
+// }
+
+
+int my_sqrt(int number)
 {
-  float temp, sqrt;
-  sqrt = number / 2;
-  temp = 0;
-  while (sqrt != temp)
+  if(number<10)
   {
-    temp = sqrt;
-    sqrt = (number / temp + temp) / 2;
+    return number+1;
   }
-  return sqrt;
+  else if(number<20)
+  {
+    return number+2;
+  }
+  else if(number<30)
+  {
+    return number+3;
+  }
+  else
+  {
+    return number+4;
+  }
 }
 
 void layer_normalization(size_t dim_i, size_t dim_j, elem_t *added_mat)
