@@ -15,6 +15,24 @@
 
 void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t accel_type)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   printf("\n\n>>Simulation for Transformer Encoder<<\n");
 
   uint64_t cycle[50] = {0};

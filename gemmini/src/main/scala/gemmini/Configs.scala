@@ -179,3 +179,9 @@ class DefaultGemminiConfig[T <: Data : Arithmetic, U <: Data, V <: Data](
   )
   case SystemBusKey => up(SystemBusKey).copy(beatBytes = 16)
 })
+
+// class GemminiRocketConfig extends Config(
+//   new gemmini.DefaultGemminiConfig ++                            // use Gemmini systolic array GEMM accelerator
+//   new freechips.rocketchip.subsystem.WithNBigCores(1) ++
+//   new chipyard.config.AbstractConfig)
+
