@@ -9,6 +9,7 @@ import scala.collection._
 class div_pe(val width:Int) extends Module
 {
     val io = IO(new Bundle {
+        // in_bit is the result
         val in_bit = Input(SInt(width.W))
         val remainder_in = Input(SInt((2*width).W))
         val div_in = Input(SInt((2*width).W))
@@ -21,12 +22,16 @@ class div_pe(val width:Int) extends Module
     })    
     when(io.remainder_in>=io.div_in)
     {
+        // update the reminder
         io.remainder_out:=io.remainder_in-io.div_in
+        // left shift and set 1 at corresponding position
         io.out_bit:=(io.in_bit<<1)+1.S 
     }
     .otherwise
     {
+        // keep the reminder(or you can say recover the reminder)
         io.remainder_out:=io.remainder_in
+        // left shift and set 0
         io.out_bit:=io.in_bit<<1
     }
     io.div_out:=io.div_in>>1
@@ -39,6 +44,7 @@ class pipline_div(val width:Int) extends Module
         val dividend = Input(SInt(width.W))
         val div = Input(SInt(width.W))
         val result = Output(SInt(width.W))
+
         val en = Input(Bool())
         val valid = Output(Bool())
     })
@@ -55,7 +61,7 @@ class pipline_div(val width:Int) extends Module
     judge_a:=io.dividend(width-1)
     judge_b:=io.div(width-1)
 
-    //judge the sign of input
+    //judge the sign of output
     when(judge_a===1.U)
     {
         alu_array(0).io.remainder_in:= (~(io.dividend-1.S))
@@ -80,6 +86,7 @@ class pipline_div(val width:Int) extends Module
     alu_array(0).io.in_valid:=io.en
     sign(0):=judge_a ^ judge_b
 
+    // connect all the PE unit in a sequence, use a line to replace the loop structure, which can become pipline in the feature
     for(i<-0 until width)
     {
         remainders(i):=alu_array(i).io.remainder_out

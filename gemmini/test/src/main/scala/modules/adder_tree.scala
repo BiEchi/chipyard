@@ -26,11 +26,13 @@ class adder_array(val width:Int,val vec_size:Int) extends Module
         val out = Output(SInt(width.W)) 
     })     
     val adder_array = Seq.fill(vec_size-1)(Module(new adder(width)))
+    // first layer
     for(i<-0 until ((vec_size-1)/2))
     {
         adder_array(i).io.in_a:=adder_array(2*i+1).io.out
         adder_array(i).io.in_b:=adder_array(2*i+2).io.out
     }
+    // other layers
     for(i<-((vec_size-1)/2) until vec_size-1)
     {
         adder_array(i).io.in_a:=io.input_vec((i-((vec_size-1)/2))*2)

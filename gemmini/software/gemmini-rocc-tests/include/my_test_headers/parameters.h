@@ -11,11 +11,13 @@
 // #define DIM_K 512
 #define wordDim 512
 
-// 
+
 #define n_head 8
 
 // 512
 #define n_words 512
+
+#define output_length 256
 
 // aux matrix
 #endif
