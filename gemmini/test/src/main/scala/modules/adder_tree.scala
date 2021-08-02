@@ -13,7 +13,7 @@ class adder(val width:Int) extends Module
         val in_b = Input(SInt(width.W))
         val out = Output(SInt(width.W))
     })      
-    val add_reg=  Reg(SInt(width.W))
+    val add_reg=  Reg(SInt(width.W)) // Use a register: wait for 1 clock cycle!
     add_reg:=io.in_a+io.in_b
     io.out:=add_reg
 }

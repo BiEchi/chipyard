@@ -47,29 +47,36 @@ https://hdlbits.01xz.net/wiki/Main_Page
 
 #### Software (by *C*)
 
-| TODO                                | Executer    | Day SPENT | PROCESS |
-| ----------------------------------- | ----------- | --------- | ------- |
-| `math.h` header file.               | Hao BAI     | 0         | DONE    |
-| `softmax()` implementation.         | Liyang QIAN | 3         | PEND    |
-| `normalize()` implementation.       | Liyang QIAN | 3         | PEND    |
-| `WS/OS/CPU` choices implementation. | Hao BAI     | DONE      | DONE    |
-| `sin()` for positional encoding.    | Liyang QIAN | 3         | DONE    |
-| `decoder()` part.                   | Wentao YAO  | 3         | DONE    |
+| TODO                                            | Executer    | Day SPENT | PROCESS |
+| ----------------------------------------------- | ----------- | --------- | ------- |
+| `math.h` header file.                           | Hao BAI     | 1         | DONE    |
+| `softmax()` implementation.                     | Liyang QIAN | 3         | PEND    |
+| `normalize()` implementation.                   | Liyang QIAN | 3         | DONE    |
+| `WS/OS/CPU` choices implementation.             | Hao BAI     | DONE      | DONE    |
+| `sin()` for positional encoding.                | Liyang QIAN | 3         | DONE    |
+| `decoder()` part.                               | Wentao YAO  | 3         | DONE    |
+| `segmented_linear_exponential.c` implementation | Wentao YAO  | 3         | DONE    |
+| `segmented_linear_sqrroot.py` implementation    | Liyang QIAN | 3         | DONE    |
+|                                                 |             |           |         |
 
 #### Hardware (by *CHISEL*)
 
-| TODO                                    | Executer    | Day SPENT | PROCESS |
-| --------------------------------------- | ----------- | --------- | ------- |
-| `pipeline_divisor` implementation       | Wentao YAO  | 6         | START   |
-| `vector_ALU` implementation             | Hao BAI     | 3         | START   |
-| `pipeline_multiplicator` implementation | Liyang QIAN | 4         | START   |
+| TODO                                             | Executer    | Day SPENT | PROCESS |
+| ------------------------------------------------ | ----------- | --------- | ------- |
+| `pipeline_divisor` implementation                | Wentao YAO  | 6         | DONE    |
+| `vector_ALU` implementation                      | Hao BAI     | 3         | DONE    |
+| `pipeline_multiplicator` implementation          | Liyang QIAN | 4         | DONE    |
+| apply `segmented_linear_exponential` to hardware | Wentao YAO  | 7         | ON      |
+| apply `segmented_linear_sqrroot` to hardware     | Hao BAI     | 7         | ON      |
+| Read the source code                             | Liyang QIAN | 7         | ON      |
+|                                                  |             |           |         |
 
 ### FIXME
 
-| FIXME                         | Executer    | Day SPENT | STATUS |
-| ----------------------------- | ----------- | --------- | ------ |
-| `normalize()` implementation. | Liyang QIAN | 3         | PEND   |
-|                               |             |           |        |
+| FIXME | Executer | Day SPENT | STATUS |
+| ----- | -------- | --------- | ------ |
+|       |          |           |        |
+|       |          |           |        |
 
 ### Our Working Time
 
@@ -96,4 +103,22 @@ $$
 Where $\alpha$, $\beta$ and $\epsilon$ are the super-parameters we deliver to the Layer Normalization Process; $\mu_L$ and $\sigma_L$ are the mean value and standard deviation of the LAYER, and $x_i$ is the value of the $i^{th}$ value of the current layer. To explain in graphs, we have:
 
 ![LayerNormalizationDetailed](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-07-09-111223.png)
+
+### Fix `normalization()`
+
+Used `segmented linear` function to substitute the `while` statements.
+
+### Problem With Software-simulated Approach `chipyard-verilator`
+
+Using `spike` software, we do not know how much time clocks it takes for a process. We could only simulate the result (structure).
+
+We used `chipyard-verilator` to transform `chisel` into `verilog`, in order to simulate the time clocks. However, this approach is not exact. The estimated clocks should be 1,600, but the carried-out clocks is 1,300. The `chipyard-verilator` uses `verilator` to transform `chisel` into `verilog`, then run `verilog` on the simulated `SoC-chip` (hardware part). We then used `build.sh` to compile `c` files using `risc-v` (software part). Also, using this approach, the software compilation part is a bit too slow for PCs.
+
+### Switch `chisel` to `verilog`
+
+This process can be found according to `chipyard-document`.
+
+### Read the source code of `gemmini`
+
+Read all the source code files in `/gemmini/src`.
 
