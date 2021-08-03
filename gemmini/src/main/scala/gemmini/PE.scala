@@ -96,7 +96,8 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
       io.out_c := (c2 >> shift_offset).clippedToWidthOf(outputType)
       io.out_b := b
       c1 := c1.mac(a, b.asTypeOf(inputType))
-      c2 := d.withWidthOf(cType)
+      c2 := d.withWid
+    thOf(cType)
     }
   }.elsewhen ((df == Dataflow.WS).B || ((df == Dataflow.BOTH).B && dataflow === WEIGHT_STATIONARY)) {
     when(prop === PROPAGATE) {

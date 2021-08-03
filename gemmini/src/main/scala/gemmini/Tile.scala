@@ -66,6 +66,7 @@ class Tile[T <: Data : Arithmetic](inputType: T, outputType: T, accType: T, df: 
     tileT(c).foldLeft(io.in_d(c)) {
       case (in_d, pe) =>
         pe.io.in_d := in_d
+        // in_d replaced by pe.io.out_c
         pe.io.out_c
     }
   }
