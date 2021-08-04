@@ -42,9 +42,11 @@ class ZeroWriter[T <: Data, U <: Data, V <: Data, Tag <: Data](config: GemminiAr
   io.req.ready := !req.valid
 
   io.resp.valid := req.valid
+  // data update
   io.resp.bits.laddr := req.bits.laddr + req.bits.block_stride * (col_counter / block_cols.U)
   io.resp.bits.mask.zipWithIndex.foreach { case (m, i) => m := col_counter + i.U < req.bits.cols }
   io.resp.bits.last := col_counter +& block_cols.U >= req.bits.cols
+  // data update over
   io.resp.bits.tag := req.bits.tag
 
   when (io.resp.fire()) {
