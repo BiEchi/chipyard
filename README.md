@@ -293,6 +293,7 @@ TileSeriesCode
 
 ```
 	1. A small module that update the value of local address, mask, last according to the req config
+	2. function: write 0 into banks
 ```
 
 ZeroWriter

@@ -331,10 +331,11 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
     reader.module.io.req.bits.status := read_issue_q.io.deq.bits.status
     reader.module.io.req.bits.cmd_id := read_issue_q.io.deq.bits.cmd_id
 
-    val (mvin_scale_in, mvin_scale_out) = VectorScalarMultiplier(
-      config.mvin_scale_args,
-      config.inputType, config.meshColumns * config.tileColumns, chiselTypeOf(reader.module.io.resp.bits),
-      is_acc = false
+    val (mvin_scale_in, mvin_scale_out) = 
+      VectorScalarMultiplier(
+        config.mvin_scale_args,
+        config.inputType, config.meshColumns * config.tileColumns, chiselTypeOf(reader.module.io.resp.bits),
+        is_acc = false
     )
     val (mvin_scale_acc_in, mvin_scale_acc_out) = if (mvin_scale_shared) (mvin_scale_in, mvin_scale_out) else (
       VectorScalarMultiplier(
@@ -344,9 +345,7 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
       )
     )
 
-    mvin_scale_in.valid := reader.module.io.resp.valid && (mvin_scale_shared.B || !reader.module.io.resp.bits.is_acc ||
-      (reader.module.io.resp.bits.is_acc && !reader.module.io.resp.bits.has_acc_bitwidth))
-
+    mvin_scale_in.valid := reader.module.io.resp.valid && (mvin_scale_shared.B || !reader.module.io.resp.bits.is_acc || (reader.module.io.resp.bits.is_acc && !reader.module.io.resp.bits.has_acc_bitwidth))
     mvin_scale_in.bits.in := reader.module.io.resp.bits.data.asTypeOf(chiselTypeOf(mvin_scale_in.bits.in))
     mvin_scale_in.bits.scale := reader.module.io.resp.bits.scale.asTypeOf(mvin_scale_t)
     mvin_scale_in.bits.repeats := reader.module.io.resp.bits.repeats
@@ -356,8 +355,7 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
     mvin_scale_out.ready := false.B
 
     if (!mvin_scale_shared) {
-      mvin_scale_acc_in.valid := reader.module.io.resp.valid &&
-        (reader.module.io.resp.bits.is_acc && reader.module.io.resp.bits.has_acc_bitwidth)
+      mvin_scale_acc_in.valid := reader.module.io.resp.valid && (reader.module.io.resp.bits.is_acc && reader.module.io.resp.bits.has_acc_bitwidth)
       mvin_scale_acc_in.bits.in := reader.module.io.resp.bits.data.asTypeOf(chiselTypeOf(mvin_scale_acc_in.bits.in))
       mvin_scale_acc_in.bits.scale := reader.module.io.resp.bits.scale.asTypeOf(mvin_scale_acc_t)
       mvin_scale_acc_in.bits.repeats := reader.module.io.resp.bits.repeats
@@ -367,8 +365,10 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
       mvin_scale_acc_out.ready := false.B
     }
 
-    reader.module.io.resp.ready := Mux(reader.module.io.resp.bits.is_acc && reader.module.io.resp.bits.has_acc_bitwidth,
-      mvin_scale_acc_in.ready, mvin_scale_in.ready)
+    reader.module.io.resp.ready := Mux(
+      reader.module.io.resp.bits.is_acc && reader.module.io.resp.bits.has_acc_bitwidth,
+      mvin_scale_acc_in.ready, 
+      mvin_scale_in.ready)
 
     val mvin_scale_finished = mvin_scale_out.fire() && mvin_scale_out.bits.last
     val mvin_scale_acc_finished = mvin_scale_acc_out.fire() && mvin_scale_acc_out.bits.last
@@ -381,12 +381,12 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
     // For DMA read responses, mvin_scale gets first priority, then mvin_scale_acc, and then zero_writer
     io.dma.read.resp.valid := mvin_scale_finished || mvin_scale_acc_finished || zero_writer_finished
 
-    io.dma.read.resp.bits.cmd_id := MuxCase(zero_writer.io.resp.bits.tag.cmd_id, Seq(
-      mvin_scale_finished -> mvin_scale_out.bits.tag.cmd_id,
+    io.dma.read.resp.bits.cmd_id := MuxCase(zero_writer.io.resp.bits.tag.cmd_id, 
+    Seq(mvin_scale_finished -> mvin_scale_out.bits.tag.cmd_id,
       mvin_scale_acc_finished -> mvin_scale_acc_out.bits.tag.cmd_id))
 
-    io.dma.read.resp.bits.bytesRead := MuxCase(zero_writer_bytes_read, Seq(
-      mvin_scale_finished -> mvin_scale_out.bits.tag.bytes_read,
+    io.dma.read.resp.bits.bytesRead := MuxCase(zero_writer_bytes_read, 
+    Seq(mvin_scale_finished -> mvin_scale_out.bits.tag.bytes_read,
       mvin_scale_acc_finished -> mvin_scale_acc_out.bits.tag.bytes_read))
 
     io.tlb(0) <> writer.module.io.tlb
@@ -440,6 +440,8 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
         ex_read_resp.valid := bio.read.resp.valid && !bio.read.resp.bits.fromDMA
         ex_read_resp.bits := bio.read.resp.bits
 
+        // mem_pipeline = 4(lantency), in Config.scala
+        // pipeline in Pipeline.scala
         val dma_read_pipe = Pipeline(dma_read_resp, mem_pipeline)
         val ex_read_pipe = Pipeline(ex_read_resp, mem_pipeline)
 
@@ -629,9 +631,7 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
         // at the same time. mvin_scale always gets priority in this cases
         val spad_last = mvin_scale_out.valid && mvin_scale_out.bits.last && !mvin_scale_out.bits.tag.is_acc
 
-        val dmaread = (from_mvin_scale || from_mvin_scale_acc) &&
-          dmaread_bank === i.U /* &&
-          (mvin_scale_same.B || from_mvin_scale || !spad_dmaread_last) */
+        val dmaread = (from_mvin_scale || from_mvin_scale_acc) && dmaread_bank === i.U /* && (mvin_scale_same.B || from_mvin_scale || !spad_dmaread_last) */
 
         // We need to make sure that we don't try to return a dma read resp from both zero_writer and either mvin_scale
         // or mvin_acc_scale at the same time. The scalers always get priority in those cases
@@ -668,9 +668,11 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
           bio.write.bits.mask := io.acc.write(i).bits.mask
         }.elsewhen (dmaread && !spad_last && !consecutive_write_block) {
           bio.write.valid := true.B
-          bio.write.bits.data := Mux(from_mvin_scale,
-            VecInit(mvin_scale_out.bits.out.map(e => e.withWidthOf(accType))).asTypeOf(acc_row_t),
-            mvin_scale_acc_out.bits.out.asTypeOf(acc_row_t))
+          bio.write.bits.data := 
+            Mux(from_mvin_scale,
+                VecInit(mvin_scale_out.bits.out.map(e => e.withWidthOf(accType))).asTypeOf(acc_row_t),
+                mvin_scale_acc_out.bits.out.asTypeOf(acc_row_t))
+
           bio.write.bits.mask :=
             Mux(from_mvin_scale,
               {
