@@ -266,7 +266,7 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
 
 #### The schema of Controller
 
-![ControllerOrginization](D:\Research\chipyard\graphs\ControllerOrginization.png)
+ControllerOrganization
 
 
 
@@ -285,7 +285,9 @@ Mesh:
 
 #### code of Tile.scala to fulfill the connection in series
 
+PEunitForWSandOS
 
+TileSeriesCode
 
 ### Zero writer
 
@@ -293,7 +295,7 @@ Mesh:
 	1. A small module that update the value of local address, mask, last according to the req config
 ```
 
-#### 
+ZeroWriter
 
 
 
