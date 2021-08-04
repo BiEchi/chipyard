@@ -130,7 +130,7 @@ In this part, you write about the goals from each component.
 
 ### PE
 
-
+Implementation of Processing Element.
 
 ### Scratch Pad
 
