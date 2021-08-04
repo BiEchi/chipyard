@@ -266,7 +266,7 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
 
 #### The schema of Controller
 
-![image-20210804134918393](C:\Users\Celty\AppData\Roaming\Typora\typora-user-images\image-20210804134918393.png)
+![ControllerOrginization](D:\Research\chipyard\graphs\ControllerOrginization.png)
 
 
 
@@ -285,7 +285,7 @@ Mesh:
 
 #### code of Tile.scala to fulfill the connection in series
 
-![image-20210804135059914](C:\Users\Celty\AppData\Roaming\Typora\typora-user-images\image-20210804135059914.png)
+
 
 ### Zero writer
 
@@ -293,7 +293,7 @@ Mesh:
 	1. A small module that update the value of local address, mask, last according to the req config
 ```
 
-#### ![image-20210804135213146](C:\Users\Celty\AppData\Roaming\Typora\typora-user-images\image-20210804135213146.png)
+#### 
 
 
 
