@@ -1,4 +1,6 @@
 // See README.md for license details.
+
+// Scala uses packages to create namespaces which allow you to modularize programs.
 package gemmini
 
 import chisel3._
