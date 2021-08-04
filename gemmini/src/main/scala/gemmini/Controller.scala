@@ -17,7 +17,7 @@ class GemminiCmd(rob_entries: Int)(implicit p: Parameters) extends Bundle {
   val cmd = new RoCCCommand
   // set the dynamic bit number
   val rob_id = UDValid(UInt(log2Up(rob_entries).W))
-
+  // overrided when extend a non-bundle or paramize the extension of bundle
   override def cloneType: this.type = new GemminiCmd(rob_entries).asInstanceOf[this.type]
 }
 
@@ -27,7 +27,7 @@ class Gemmini[T <: Data : Arithmetic, U <: Data, V <: Data](val config: GemminiA
   extends LazyRoCC (
     opcodes = config.opcodes,
     nPTWPorts = 1) {
-
+  println("this is test for spike")
   Files.write(Paths.get(config.headerFilePath), config.generateHeader().getBytes(StandardCharsets.UTF_8))
 
   val xLen = p(XLen)
@@ -115,16 +115,12 @@ class GemminiModule[T <: Data: Arithmetic, U <: Data, V <: Data]
   val max_exs = rob_full_entries
   val max_sts = rob_partial_entries / 2
 
-  // TODO replace 4,12,2 with parameters based on ROB size
+  // guess: translate the input cmd to machine code using two step: loopConv + loopMatmul
+  // in LoopConv.scala:
   val (conv_cmd, loop_conv_unroller_busy) = LoopConv(raw_cmd, rob.io.ld_utilization, rob.io.st_utilization, rob.io.ex_utilization,
     meshRows*tileRows, coreMaxAddrBits, rob_entries, max_lds, max_exs, max_sts, sp_banks * sp_bank_entries, acc_banks * acc_bank_entries,
     inputType.getWidth, accType.getWidth, dma_maxbytes)
-
-  // val (compressed_cmd, compressor_busy) = InstCompressor(unrolled_cmd)
-  // compressed_cmd.ready := false.B
-
-  // val (unrolled_cmd, loop_matmul_unroller_busy) = LoopMatmul(unrolled_cmd_after_conv, rob.io.ld_utilization, rob.io.st_utilization, rob.io.ex_utilization,
-
+  // in LoopMatmul.scala:
   val (loop_cmd, loop_matmul_unroller_busy) = LoopMatmul(conv_cmd, rob.io.ld_utilization, rob.io.st_utilization, rob.io.ex_utilization,
     meshRows*tileRows, coreMaxAddrBits, rob_entries, max_lds, max_exs, max_sts, sp_banks * sp_bank_entries, acc_banks * acc_bank_entries,
     inputType.getWidth, accType.getWidth, dma_maxbytes)
@@ -144,6 +140,8 @@ class GemminiModule[T <: Data: Arithmetic, U <: Data, V <: Data]
   // Wire up controllers to ROB
   rob.io.alloc.valid := false.B
   // rob.io.alloc.bits := compressed_cmd.bits
+
+  // guess: the bits is the data of unrolled_cmd
   rob.io.alloc.bits := unrolled_cmd.bits
 
   /*
@@ -251,6 +249,7 @@ class GemminiModule[T <: Data: Arithmetic, U <: Data, V <: Data]
 
     // TODO if necessary, change how the responses are handled when fromIm2Col is added to spad read interface
 
+    // ex and im2col's read information is configged by spad
     ex_read.resp.valid := spad_read.resp.valid
     im2col_read.resp.valid := spad_read.resp.valid
 
@@ -311,7 +310,7 @@ class GemminiModule[T <: Data: Arithmetic, U <: Data, V <: Data]
 
   // assert(!io.interrupt, "Interrupt handlers have not been written yet")
 
-  // Cycle counters
+  // Cycle counters, it has been defined here
   val ld_cycles = RegInit(0.U(34.W))
   val st_cycles = RegInit(0.U(34.W))
   val ex_cycles = RegInit(0.U(34.W))

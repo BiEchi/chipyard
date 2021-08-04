@@ -128,13 +128,50 @@ Read all the source code files in `/gemmini/src`.
 
 In this part, you write about the goals from each component.
 
+### Overall Architechture
+
+![OverallArchitecture](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082749.png)
+
 ### PE
 
-Implementation of Processing Element.
-
-### Scratch Pad
 
 
+### Controller
 
+```
+	1. In Controller, the rocc instruction from io.cmd will be unrolled, by loopConv function and loopMatMul function, to a machine code to control load,st,ex unit. The unrolled command will be store in the re-order buffer firstly  after being unrolled.
+	2. Load,ex,st unit will drive the dma in Spad unit.
+	3. The control have busy and interrupt status judgement and signals.
+	4. ROB unit as a queue, or buffer, do not relate to the compile process of cmd, so it maybe not be required to change
+```
 
+#### The schema of Controller
 
+![ControllerOrginization](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082805.png)
+
+### PE + Tile + Mesh
+
+```
+PE：
+	1. the previous PE's out_c port will be connected to the next PE's in_d port according to the chisel code in Tile.scala
+	2. PE unit has Mac unit(function) to execute matrix multiplication and addition
+	3. Don't know where to store the weight when WS situation
+Tile:
+	Connect the PE units in series by this form of code, see figure below
+Mesh:
+	Similar connection logic as Tile Unit
+```
+
+#### code of Tile.scala to fulfill the connection in series
+
+![PEunitForWSandOS](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082812.png)
+
+![TileSeriesCode](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082818.png)
+
+### Zero writer
+
+```
+	1. A small module that update the value of local address, mask, last according to the req config
+```
+
+![ZeroWriter](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082823.png)

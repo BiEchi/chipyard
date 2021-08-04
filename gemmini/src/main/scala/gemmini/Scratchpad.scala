@@ -10,6 +10,11 @@ import freechips.rocketchip.tilelink.{TLIdentityNode, TLXbar}
 
 import Util._
 
+
+
+
+// Mem read and wirite signal definition
+// spd mem read req
 class ScratchpadMemReadRequest[U <: Data](local_addr_t: LocalAddr, scale_t_bits: Int)
                               (implicit p: Parameters) extends CoreBundle {
   val vaddr = UInt(coreMaxAddrBits.W)
@@ -27,6 +32,7 @@ class ScratchpadMemReadRequest[U <: Data](local_addr_t: LocalAddr, scale_t_bits:
   override def cloneType: this.type = new ScratchpadMemReadRequest(local_addr_t, scale_t_bits).asInstanceOf[this.type]
 }
 
+// spd mem wirte req
 class ScratchpadMemWriteRequest(local_addr_t: LocalAddr)
                               (implicit p: Parameters) extends CoreBundle {
   val vaddr = UInt(coreMaxAddrBits.W)
@@ -45,6 +51,9 @@ class ScratchpadMemWriteRequest(local_addr_t: LocalAddr)
   override def cloneType: this.type = new ScratchpadMemWriteRequest(local_addr_t).asInstanceOf[this.type]
 }
 
+
+
+
 class ScratchpadMemWriteResponse extends Bundle {
   val cmd_id = UInt(8.W) // TODO don't use a magic number here
 }
@@ -54,6 +63,9 @@ class ScratchpadMemReadResponse extends Bundle {
   val cmd_id = UInt(8.W) // TODO don't use a magic number here
 }
 
+
+
+
 class ScratchpadReadMemIO[U <: Data](local_addr_t: LocalAddr, scale_t_bits: Int)
                          (implicit p: Parameters) extends CoreBundle {
   val req = Decoupled(new ScratchpadMemReadRequest(local_addr_t, scale_t_bits))
@@ -62,7 +74,6 @@ class ScratchpadReadMemIO[U <: Data](local_addr_t: LocalAddr, scale_t_bits: Int)
   override def cloneType: this.type = new ScratchpadReadMemIO(local_addr_t, scale_t_bits).asInstanceOf[this.type]
 }
 
-// class ScratchpadWriteMemIO(val nBanks: Int, val nRows: Int, val acc_rows: Int)
 class ScratchpadWriteMemIO(local_addr_t: LocalAddr)
                          (implicit p: Parameters) extends CoreBundle {
   val req = Decoupled(new ScratchpadMemWriteRequest(local_addr_t))
@@ -71,6 +82,12 @@ class ScratchpadWriteMemIO(local_addr_t: LocalAddr)
   override def cloneType: this.type = new ScratchpadWriteMemIO(local_addr_t).asInstanceOf[this.type]
 }
 
+
+
+
+
+
+// spd read and wirite control
 class ScratchpadReadReq(val n: Int) extends Bundle {
   val addr = UInt(log2Ceil(n).W)
   val fromDMA = Bool()
@@ -93,9 +110,15 @@ class ScratchpadWriteIO(val n: Int, val w: Int, val mask_len: Int) extends Bundl
   val data = Output(UInt(w.W))
 }
 
+
+
+
+
+
+// spd store unit
 class ScratchpadBank(n: Int, w: Int, aligned_to: Int, single_ported: Boolean) extends Module {
   // This is essentially a pipelined SRAM with the ability to stall pipeline stages
-
+  // qly: don't know how the mask bit does here
   require(w % aligned_to == 0 || w < aligned_to)
   val mask_len = (w / (aligned_to * 8)) max 1 // How many mask bits are there?
   val mask_elem = UInt((w min (aligned_to * 8)).W) // What datatype does each mask bit correspond to?
@@ -105,6 +128,7 @@ class ScratchpadBank(n: Int, w: Int, aligned_to: Int, single_ported: Boolean) ex
     val write = Flipped(new ScratchpadWriteIO(n, w, mask_len))
   })
 
+  // details in SyncReadMem.scala
   val mem = SyncReadMem(n, Vec(mask_len, mask_elem))
 
   // When the scratchpad is single-ported, the writes take precedence
@@ -140,11 +164,20 @@ class ScratchpadBank(n: Int, w: Int, aligned_to: Int, single_ported: Boolean) ex
   io.read.resp <> q.io.deq
 }
 
+
+
+
+
+
+
+
+
+// spd whole orginization
 class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, U, V])
     (implicit p: Parameters, ev: Arithmetic[T]) extends LazyModule {
 
-  import config._
-  import ev._
+  import config._ // config.scala
+  import ev._ // unknown
 
   val maxBytes = dma_maxbytes
   val dataBits = dma_buswidth
@@ -181,11 +214,13 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
 
       // SRAM ports
       val srams = new Bundle {
+        // sp_banks is setted by config
         val read = Flipped(Vec(sp_banks, new ScratchpadReadIO(sp_bank_entries, spad_w)))
         val write = Flipped(Vec(sp_banks, new ScratchpadWriteIO(sp_bank_entries, spad_w, (spad_w / (aligned_to * 8)) max 1)))
       }
 
-      // Accumulator ports
+      // Accumulator ports 
+      // from accumulatorMem.scala
       val acc = new Bundle {
         val read_req = Flipped(Vec(acc_banks, Decoupled(new AccumulatorReadReq(
           acc_bank_entries, log2Up(accType.getWidth), acc_scale_args.multiplicand_t
@@ -206,7 +241,7 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
       val busy = Output(Bool())
       val flush = Input(Bool())
     })
-
+    // create a queue using the input from io.dma.write.req from https://stackoverflow.com/questions/30380823/what-does-queue-function-do-in-chisel
     val write_dispatch_q = Queue(io.dma.write.req)
     write_dispatch_q.ready := false.B
     // Write scale queue is necessary to maintain in-order requests to accumulator scale unit
@@ -223,7 +258,7 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
     write_issue_q.io.enq.valid := false.B
     write_issue_q.io.enq.bits := write_scale_q.io.deq.bits
 
-
+    // garbage is the input's characters 
     // Garbage can immediately fire between dispatch_q and scale_q
     when (write_dispatch_q.bits.laddr.is_garbage()) {
       write_scale_q.io.enq <> write_dispatch_q
