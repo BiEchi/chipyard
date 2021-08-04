@@ -176,3 +176,24 @@ Mesh:
 ```
 
 ![ZeroWriter](http://jacklovespictures.oss-cn-beijing.aliyuncs.com/2021-08-04-082823.png)
+
+### Spad module
+
+1. Io.srams will control the sp_bank directly, and also the io.acc
+
+2. There is a vec_mul unit to calculate vector multiplication and write back to the sp_banks and acc_banks
+
+3. Every reading instruction of sp_banks and acc_banks will feedback the result to writer
+
+4. The function of Reader:
+
+5. The function of Writer:
+
+6. DMA: the interaction between Memory and SpadBankss
+
+   Spad_OverallArchitecture
+
+   
+
+
+
