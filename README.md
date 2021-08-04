@@ -255,6 +255,14 @@ class PE[T <: Data](inputType: T, outputType: T, accType: T, df: Dataflow.Value,
 
 ```
 
+### Controller
+
+```
+
+```
+
+
+
 
 
 
