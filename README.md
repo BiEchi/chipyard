@@ -185,9 +185,9 @@ Mesh:
 
 3. Every reading instruction of sp_banks and acc_banks will feedback the result to writer
 
-4. The function of Reader: Read Data from DRAM according to the req.addre(guess)
+4. The function of Reader: Read Data from DRAM by TLB + dma.rd.req.vaddr(virtual address)
 
-5. The function of Writer:  Write Data into DRAM according to the req.addre(guess)
+5. The function of Writer:  Write Data into DRAM by TLB + dma.w.req.vaddr(virtual address)
 
 6. DMA: the interaction between Memory and SpadBankss
 
