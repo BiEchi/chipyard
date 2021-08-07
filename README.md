@@ -138,12 +138,11 @@ In this part, you write about the goals from each component.
 
 ### Controller
 
-```
-	1. In Controller, the rocc instruction from io.cmd will be unrolled, by loopConv function and loopMatMul function, to a machine code to control load,st,ex unit. The unrolled command will be store in the re-order buffer firstly  after being unrolled.
-	2. Load,ex,st unit will drive the dma in Spad unit.
-	3. The control have busy and interrupt status judgement and signals.
-	4. ROB unit as a queue, or buffer, do not relate to the compile process of cmd, so it maybe not be required to change
-```
+ 	1. In Controller, the rocc instruction from io.cmd will be unrolled, by loopConv function and loopMatMul function, to a machine code to control load,st,ex unit. The unrolled command will be store in the re-order buffer firstly  after being unrolled, decompose the instruction into fundamental instruction.
+ 	2. ROB unit as a queue, or buffer, do not relate to the compile process of cmd, so it maybe not be required to change, identified by inst_id.
+ 	3. Load,ex,st unit will drive the dma in Spad unit.
+ 	4. In load, ex, st controller will compile the rocc instruction into machine instruction.
+ 	5. The control have busy and interrupt status judgement and signals.
 
 #### The schema of Controller
 
@@ -189,9 +188,9 @@ Mesh:
 
 5. The function of Writer:  Write Data into DRAM by TLB + dma.w.req.vaddr(virtual address)
 
-6. DMA: the interaction between Memory and SpadBankss
+6. DMA: the interaction between Memory and SpadBanks
 
-   Spad_OverallArchitecture
+   
 
    
 
