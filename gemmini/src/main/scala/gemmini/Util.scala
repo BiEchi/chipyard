@@ -10,7 +10,7 @@ object Util {
       0.U
     } else {
       assert(n <= max.U, "cannot wrapAdd when n is larger than max")
-      Mux(u >= max.U - n + 1.U && n =/= 0.U, n - (max.U - u) - 1.U, u + n)
+      Mux((u >= max.U - n + 1.U && n =/= 0.U), n - (max.U - u) - 1.U, u + n)
     }
   }
 
@@ -86,6 +86,7 @@ object Util {
 
   // This function will return "next" with a 0-cycle delay when the "enable" signal is high. It's like a queue with
   // the "pipe" and "flow" parameters set to "true"
+  // 0 delay or 1 delay
   def RegEnableThru[T <: Data](next: T, enable: Bool): T = {
     val buf = RegEnable(next, enable)
     Mux(enable, next, buf)
