@@ -15,24 +15,6 @@
 
 void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t accel_type)
 {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   printf("\n\n>>Simulation for Transformer Encoder<<\n");
 
   uint64_t cycle[50] = {0};
@@ -181,19 +163,29 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   }
   end = read_cycles();
   cycle[length] = end - start;
+  printf("Time for concatination: %d\n", cycle[length]);
   length++;
-  printf("Time for concatination: %d\n", end - start);
 
   // multihead + add&norm
   static elem_t multihead_weight[n_head * weightDim][wordDim];
   static elem_t normalized_z_mat[wordNum][wordDim];
-  revised_add_normalize(wordNum,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)word_vector); 
+  start = read_cycles();
+  revised_add_normalize(wordNum,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)word_vector);
+  end = read_cycles();
+  cycle[length] = end - start;
+  printf("Time for add & normalization: %d\n",cycle[length]);
+  length++;
 
   // FC + add & norm
   static elem_t fc_weight1[wordDim][wordDim];
   static elem_t fc_result1[wordNum][wordDim];
   static elem_t final_encoder_output[wordDim][wordDim];
+  start = read_cycles();
   revised_add_normalize(wordNum,wordDim,wordDim,(elem_t*)normalized_z_mat,(elem_t*)fc_weight1,(elem_t *)final_encoder_output,(elem_t *)normalized_z_mat);
-
+  end = read_cycles();
+  cycle[length] = end - start;
+  printf("Time for add & normalization: %d\n",cycle[length]);
+  length++;
+  total_time((uint64_t*)cycle,length);
   return;
 }

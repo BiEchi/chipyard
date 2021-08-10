@@ -206,7 +206,12 @@ void decoder(enum tiled_matmul_type_t accel_type)
 
   //multihead and add&norm
   static elem_t normalized_z_mat[output_length][wordDim];
+  start = read_cycles();
   revised_add_normalize(output_length,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)positioned_word);
+  end = read_cycles();
+  cycle[length] = end - start;
+  printf("Time for add & normalization: %d\n",cycle[length]);
+  length++;
 
   //encoder-decoder attention
   static elem_t q_weights2[n_head][wordDim][weightDim];
@@ -301,8 +306,8 @@ void decoder(enum tiled_matmul_type_t accel_type)
   }
   end = read_cycles();
   cycle[length] = end - start;
+  printf("Time for softmax(Q*K^T)*V: %d\n", cycle[length]);
   length++;
-  printf("Time for softmax(Q*K^T)*V: %d\n", end - start);
 
 
   //concat z_vectors
@@ -321,18 +326,28 @@ void decoder(enum tiled_matmul_type_t accel_type)
   }
   end = read_cycles();
   cycle[length] = end - start;
+  printf("Time for concatination: %d\n", cycle[length]);
   length++;
-  printf("Time for concatination: %d\n", end - start);
 
   // multihead and add&&norm
   static elem_t normalized_z_mat2[output_length][wordDim];
+  start = read_cycles();
   revised_add_normalize(output_length,wordDim,n_head * weightDim,(elem_t *)concat_z2,(elem_t *)multihead_weight2,(elem_t *)normalized_z_mat2,(elem_t *)normalized_z_mat);
+  end = read_cycles();
+  cycle[length] = end - start;
+  printf("Time for add & normalization: %d\n",cycle[length]);
+  length++;
  
   // FC+add&&norm
   static elem_t fc_weight1[wordDim][wordDim];
   static elem_t linear_input[output_length][wordDim];
   start = read_cycles();
   revised_add_normalize(output_length,wordDim,wordDim,(elem_t *)normalized_z_mat2,(elem_t *)fc_weight1,(elem_t *)linear_input,(elem_t *)normalized_z_mat2);
+  end = read_cycles();
+  cycle[length] = end - start;
+  printf("Time for add & normalization: %d\n",cycle[length]);
+  length++;
+
 
   //linear layer
   start = read_cycles();
@@ -347,10 +362,10 @@ void decoder(enum tiled_matmul_type_t accel_type)
   static elem_t softmax_final[output_length][n_words];
   softmaxFunc(output_length, n_words, linear_output, softmax_final);
   end = read_cycles();
-  printf("Time for linear layer & softmax: %d\n",end-start);
   cycle[length] = end - start;
+  printf("Time for linear layer & softmax: %d\n",cycle[length]);
   length++;
-
+  total_time(cycle,length);
   return;
 }
 

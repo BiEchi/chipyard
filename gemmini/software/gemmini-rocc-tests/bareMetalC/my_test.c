@@ -18,8 +18,15 @@
 
 int main()
 {
-  /***** DO NOT CHANGE CONTENT BELOW *****/
 
+
+
+
+
+
+
+  
+  /***** DO NOT CHANGE CONTENT BELOW *****/
 #ifndef BAREMETAL
   if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0)
   {

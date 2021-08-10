@@ -352,8 +352,6 @@ void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_
   for (size_t i = 0; i < dim_j; i++)
     for (size_t j = 0; j < dim_j; j++)
       id_mat[i][j] = (i == j);
-  u_int64_t start, end;
-  start = read_cycles();
   tiled_matmul_auto(dim_i, dim_j, dim_k,
                     mat_a, mat_b, mat_d, normalized_mat,
                     dim_k, dim_j, dim_j, dim_j,
@@ -365,8 +363,6 @@ void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_
                     WS);
 
   layer_normalization(dim_i,dim_j,normalized_mat);
-  end = read_cycles();
-  printf("Time for add & normalization: %d\n", end - start);
 }
 
 
@@ -386,6 +382,15 @@ void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, ele
                     false, true,
                     3,
                     WS);
+}
+
+void total_time(uint64_t *cycle_array, int length){
+  uint64_t total = 0;
+  for (int i = 0; i < length; i++)
+  {
+    total += cycle_array[i];
+  }
+  printf("the total time is %d\n", total);
 }
 
 #endif /* AUX_H */
