@@ -17,7 +17,7 @@
 #include "include/my_test_headers/encoder.h"
 
 int main()
-{  
+{
   /***** DO NOT CHANGE CONTENT BELOW *****/
 #ifndef BAREMETAL
   if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0)
@@ -66,9 +66,9 @@ int main()
   encoder(word_vector0, acceleration_type = WS);
   decoder(acceleration_type = WS);
 
-  // printf("\n\n***** These tests are carried out by OS MatMul Case *****");
-  // encoder(word_vector0, acceleration_type=OS);
-  // decoder(acceleration_type=OS);
+  printf("\n\n***** These tests are carried out by OS MatMul Case *****");
+  encoder(word_vector0, acceleration_type=OS);
+  decoder(acceleration_type=OS);
 
 
   // printf("\n\n***** These tests are carried out by CPU MatMul Case *****");

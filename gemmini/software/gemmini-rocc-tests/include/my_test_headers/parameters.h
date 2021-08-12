@@ -2,22 +2,14 @@
 #define PARAMETERS_H
 #include <stdio.h>
 
-// #define DIM_I 64
 #define wordNum 1
-
-// #define DIM_J 512
-#define weightDim 512
-
-// #define DIM_K 512
-#define wordDim 512
+#define wordDim 16
+#define weightDim 16
 
 
 #define n_head 1
-
-// 512
-#define n_words 512
-
-#define output_length 256
+#define n_words 16
+#define output_length 16
 
 // aux matrix
 #endif
