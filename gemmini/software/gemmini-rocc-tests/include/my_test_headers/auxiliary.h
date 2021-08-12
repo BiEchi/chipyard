@@ -285,7 +285,7 @@ void loading_Positional_embedding(size_t length, size_t dimension, elem_t positi
 // }
 
 // Cannot store the value into mat
-void row_summary(int column, elem_t *InputMat, elem_t *result, elem_t *allOne_vector)
+void row_summary(int column, elem_t *InputMat, elem_t *result, elem_t *allOne_vector,enum tiled_matmul_type_t accel_type)
 {
   // printf("row sum\n");
   tiled_matmul_auto(column, 1, column,
@@ -297,12 +297,12 @@ void row_summary(int column, elem_t *InputMat, elem_t *result, elem_t *allOne_ve
                     false, false,
                     false, false,
                     3,
-                    WS);
+                    accel_type);
   return;
 }
 
 // generate the softmax result
-void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t softmaxResultMat[row][column])
+void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t softmaxResultMat[row][column],enum tiled_matmul_type_t accel_type)
 {
   // printf("softmax function\n");
   elem_t allOne_vector[column][1];
@@ -322,8 +322,7 @@ void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t so
 
     }
   }
-  
-  row_summary(column, (elem_t *)MatQK, (elem_t *)rowSum, (elem_t *)allOne_vector);
+  row_summary(column, (elem_t *)MatQK, (elem_t *)rowSum, (elem_t *)allOne_vector,accel_type);
   for (int i = 0; i < column; i++)
   {
     for (int j = 0; j < column; j++)
@@ -342,11 +341,11 @@ void softmaxFunc(size_t row, size_t column, elem_t MatQK[row][column], elem_t so
                     false, false,
                     false, false,
                     3,
-                    WS);
+                    accel_type);
   return;
 }
 
-void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_a, elem_t *mat_b, elem_t *normalized_mat,elem_t* mat_d)
+void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_a, elem_t *mat_b, elem_t *normalized_mat,elem_t* mat_d, enum tiled_matmul_type_t accel_type)
 {
   elem_t id_mat[dim_j][dim_j];
   for (size_t i = 0; i < dim_j; i++)
@@ -360,29 +359,29 @@ void revised_add_normalize(size_t dim_i, size_t dim_j,size_t dim_k, elem_t *mat_
                     false, false,
                     false, true,
                     3,
-                    WS);
+                    accel_type);
 
   layer_normalization(dim_i,dim_j,normalized_mat);
 }
 
 
-void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, elem_t *added_mat)
-{
-  elem_t id_mat[dim_j][dim_j];
-  for (size_t i = 0; i < dim_j; i++)
-    for (size_t j = 0; j < dim_j; j++)
-      id_mat[i][j] = (i == j);
-  u_int64_t start, end;
-  tiled_matmul_auto(dim_i, dim_j, dim_j,
-                    (elem_t *)mat_a, (elem_t *)id_mat, (elem_t *)mat_b, (elem_t *)added_mat,
-                    dim_j, dim_j, dim_j, dim_j,
-                    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-                    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
-                    false, false,
-                    false, true,
-                    3,
-                    WS);
-}
+// void add_normalize(size_t dim_i, size_t dim_j, elem_t *mat_a, elem_t *mat_b, elem_t *added_mat)
+// {
+//   elem_t id_mat[dim_j][dim_j];
+//   for (size_t i = 0; i < dim_j; i++)
+//     for (size_t j = 0; j < dim_j; j++)
+//       id_mat[i][j] = (i == j);
+//   u_int64_t start, end;
+//   tiled_matmul_auto(dim_i, dim_j, dim_j,
+//                     (elem_t *)mat_a, (elem_t *)id_mat, (elem_t *)mat_b, (elem_t *)added_mat,
+//                     dim_j, dim_j, dim_j, dim_j,
+//                     MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+//                     NO_ACTIVATION, ACC_SCALE_IDENTITY, 0, false,
+//                     false, false,
+//                     false, true,
+//                     3,
+//                     WS);
+// }
 
 void total_time(uint64_t *cycle_array, int length){
   uint64_t total = 0;

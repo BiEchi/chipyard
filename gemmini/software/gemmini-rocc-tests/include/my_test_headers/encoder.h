@@ -121,7 +121,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   start = read_cycles();
   for (int count = 0; count < n_head; count++)
   {
-    softmaxFunc(wordDim, wordDim, temp_qk[count], softmaxResultMat[count]);
+    softmaxFunc(wordDim, wordDim, temp_qk[count], softmaxResultMat[count],accle_type);
   }
   end = read_cycles();
   cycle[length] = end - start;
@@ -170,7 +170,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   static elem_t multihead_weight[n_head * weightDim][wordDim];
   static elem_t normalized_z_mat[wordNum][wordDim];
   start = read_cycles();
-  revised_add_normalize(wordNum,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)word_vector);
+  revised_add_normalize(wordNum,wordDim,n_head * weightDim,(elem_t *)concat_z,(elem_t *)multihead_weight,(elem_t *)normalized_z_mat,(elem_t *)word_vector,accle_type);
   end = read_cycles();
   cycle[length] = end - start;
   printf("Time for add & normalization: %d\n",cycle[length]);
@@ -181,7 +181,7 @@ void encoder(elem_t word_vector0[wordNum][wordDim], enum tiled_matmul_type_t acc
   static elem_t fc_result1[wordNum][wordDim];
   static elem_t final_encoder_output[wordDim][wordDim];
   start = read_cycles();
-  revised_add_normalize(wordNum,wordDim,wordDim,(elem_t*)normalized_z_mat,(elem_t*)fc_weight1,(elem_t *)final_encoder_output,(elem_t *)normalized_z_mat);
+  revised_add_normalize(wordNum,wordDim,wordDim,(elem_t*)normalized_z_mat,(elem_t*)fc_weight1,(elem_t *)final_encoder_output,(elem_t *)normalized_z_mat,accle_type);
   end = read_cycles();
   cycle[length] = end - start;
   printf("Time for add & normalization: %d\n",cycle[length]);

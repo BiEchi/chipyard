@@ -15,7 +15,30 @@ https://github.com/BiEchi/chipyard
 ```shell
 docker run -it --name=chipyard-transformer-software \
 --mount type=bind,source="/Users/mac/Desktop/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer:software
+
+docker run -it --name=chipyard-transformer-ws-sentence \
+--mount type=bind,source="/home/user/gemmini"/software,target=/root/chipyard/generators/gemmini/software chipyard_wzs:v2
+
+docker run -it --name=chipyard-transformer-software \
+--mount type=bind,source="/mnt/d/Research/chipyard"/gemmini,target=/root/chipyard/generators/gemmini chipyard/chipyard_transformer:software
 ```
+
+### Use the software simulator
+
+1. Spike
+
+   ```
+   spike --extension=gemmini <some/gemmini/baremetal/test>
+   ```
+
+2. verilator
+
+   ```
+   cd ~/chipyard/sims/verilator # or "sims/vcs"
+   make CONFIG=GemminiRocketConfig
+   ```
+
+   
 
 ### Test Functionality
 
@@ -218,6 +241,4 @@ In this part, you write about the goals from each component.
       ![image-20210809202345913](graphs/image-20210809202345913.png)
 
 ![image-20210809202356271](graphs/image-20210809202356271.png)
-
-
 

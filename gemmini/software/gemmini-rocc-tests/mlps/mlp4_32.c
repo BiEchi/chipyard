@@ -8,7 +8,7 @@
 #include "include/gemmini.h"
 #include "include/gemmini_nn.h"
 
-#include "parameters4.h"
+#include "parameters8.h"
 
 int main (int argc, char * argv[]) {
 #ifndef BAREMETAL
