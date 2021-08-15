@@ -68,6 +68,7 @@ class MeshWithDelays[T <: Data: Arithmetic, U <: TagQueueTag with Data]
     val tags_in_progress = Output(Vec(tagqlen, tagType))
   })
 
+  // make the input matrix into lentancy part
   def shifted[T <: Data](x: Vec[Vec[T]], banks: Int, reverse: Boolean = false) = {
     assert(x.size % banks == 0, "cannot bank without clean divisors")
     assert(pe_latency == 0 || (tileRows == 1 && tileColumns == 1), "If tiles are larger than 1x1, then PEs must have 0 latency")
@@ -87,7 +88,6 @@ class MeshWithDelays[T <: Data: Arithmetic, U <: TagQueueTag with Data]
       val RegShifted = (SRAMShifted zip indexes).map { case (srs, j) =>
         ShiftRegister(srs, j*(pe_latency+1))
       }
-
       RegShifted
     }
   }
