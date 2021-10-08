@@ -1,6 +1,6 @@
-## Chipyard Transformer Accelerator
+# Chipyard Transformer Accelerator
 
-This is a test repo for chipyard greenhands.
+This is a repo for constructing the working environment for developing Gemmini on a local machine. Also, if you want to reproduce the code in our paper, following steps here is the easiest method to go.
 
 ## Environment (Workspace) Construction
 
